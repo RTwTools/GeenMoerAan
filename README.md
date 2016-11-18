@@ -4,4 +4,3 @@
 
 Please add more readme info for seting up working enviroments etc.
 
-test
