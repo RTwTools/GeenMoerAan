@@ -1,8 +1,16 @@
 
 <launch>
-	<include file="$(find abb_irb120_moveit_config)/launch/moveit_planning_execution.launch"/>
+	
+	<include file="$(find abb_irb120_moveit_config)/launch/moveit_planning_execution.launch">
+		 <param name="robot_ip" value="$(arg robot_ip)" unless="$(arg sim)"/>
+		 <param name="sim" value="$(arg sim)" default="true"/>
+	</include>
+	
 	<node 
 		name="simulationV2" 
 		pkg="simulationV2" 
-		type="simulationv2"/>
+		type="simulationv2"
+		output="screen" 
+		launch-prefix="xterm -e"
+	/>
 </launch>
