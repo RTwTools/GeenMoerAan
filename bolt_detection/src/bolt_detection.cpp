@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/PoseArray.h>
 #include <nav_msgs/Path.h>
 #include <opencv2/opencv.hpp>
 #include "opencv2/imgproc/imgproc.hpp"
@@ -12,7 +13,7 @@
 #define ESC_KEY					27
 #define CALIBRATION_FILE_PATH	"/resources/out_camera_data.yml"
 #define TRANSFORM_FILE_PATH 	"/resources/out_transform_data.yml"
-#define CAMERA_FRAME "camera_view" //TODO check name
+#define CAMERA_FRAME "my_camera_view_link" //TODO check name
 
 #define CANNY_THRESH 80
 
@@ -32,7 +33,7 @@ cv::VideoCapture camera;
 cv::Mat cameraMatrix, distCoeffs;
 cv::Mat transformMatrix = cv::Mat(3, 3, CV_32FC1);
 cv::Mat image, imageCropped;
-nav_msgs::Path path;
+geometry_msgs::PoseArray holes;
 ros::Publisher pubHoles;
 
 void addHole(int x, int y)
@@ -40,17 +41,17 @@ void addHole(int x, int y)
   float mm_x = (float) x * ((float)IMAGE_WIDTH_MM / IMAGE_WIDTH_PX);
   float mm_y = (float) y * ((float)IMAGE_HEIGHT_MM / IMAGE_HEIGHT_PX);
 
-  geometry_msgs::PoseStamped point;
+  geometry_msgs::Pose point;
 
-  point.header.stamp = ros::Time::now();
-  point.header.frame_id = CAMERA_FRAME;
-  point.pose.orientation.w = 1.0;
-  point.pose.position.x = (mm_x / 1000);
-  point.pose.position.y = (mm_y / 1000);
+  /*point.header.stamp = ros::Time::now();
+  point.header.frame_id = CAMERA_FRAME;*/
+  point.orientation.w = 1.0;
+  point.position.x = (mm_y / 1000);
+  point.position.y = (mm_x / 1000);
 
-  ROS_DEBUG("Added hole: x[%f], y[%f].",  point.pose.position.x,  point.pose.position.y);
+  ROS_DEBUG("Added hole: x[%f], y[%f].",  point.position.x,  point.position.y);
 
-  path.poses.push_back(point);
+  holes.poses.push_back(point);
 }
 
 cv::Mat detectHoles(cv::Mat * object)
@@ -64,7 +65,7 @@ cv::Mat detectHoles(cv::Mat * object)
 
   cv::findContours(cannyOutput, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cv::Point(0,0));
 
-  path.poses.clear();
+  holes.poses.clear();
 
   // Get the moments
   cv::vector<cv::Moments> mu(contours.size() );
@@ -101,10 +102,10 @@ cv::Mat detectHoles(cv::Mat * object)
 void sendHoles(void)
 {
   //send holes
-  path.header.stamp = ros::Time::now();
-  pubHoles.publish(path);
+  holes.header.stamp = ros::Time::now();
+  pubHoles.publish(holes);
 
-  ROS_DEBUG("Sent %i holes.", (int)path.poses.size());
+  ROS_DEBUG("Sent %i holes.", (int)holes.poses.size());
 }
 
 int main(int argc, char *argv[])
@@ -112,7 +113,7 @@ int main(int argc, char *argv[])
   ros::init(argc, argv, "bolt_detection_node");
   ros::NodeHandle n;
 
-  pubHoles = n.advertise<nav_msgs::Path>("/holes", 1);
+  pubHoles = n.advertise<geometry_msgs::PoseArray>("/holes", 1);
   ros::Timer timer = n.createTimer(ros::Duration(2.0), boost::bind(&sendHoles));
 
   ROS_INFO("Bolt Detection Node Started!");
