@@ -63,7 +63,9 @@ cv::Mat detectHoles(cv::Mat * object)
   cv::cvtColor(*object, imageGray, CV_BGR2GRAY);
   cv::Canny(imageGray, cannyOutput, CANNY_THRESH, CANNY_THRESH*3, 3);
 
-  cv::findContours(cannyOutput, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cv::Point(0,0));
+
+   HoughCircles(cannyOutput, contours, CV_HOUGH_GRADIENT, 1, canny_i.rows/9, 105, 18, 0, 20 );
+  //cv::findContours(cannyOutput, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cv::Point(0,0));
 
   holes.poses.clear();
 
@@ -78,7 +80,6 @@ cv::Mat detectHoles(cv::Mat * object)
   {
     mc[i] = cv::Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 );
     //filter circles
-
   }
 
   /// Draw contours
@@ -86,15 +87,23 @@ cv::Mat detectHoles(cv::Mat * object)
 
   for( int i = 0; i< contours.size(); i++ )
   {
-    if (mu[i].m00 > 10)
-    {
+    //if (mu[i].m00 > 10)
+    //{
       //printf(" * Contour[%d] - Area (M_00) = %.2f - Area OpenCV: %.2f - Length: %.2f \n", i, mu[i].m00, contourArea(contours[i]), arcLength( contours[i], true ) );
-      cv::Scalar color = cv::Scalar(0, 255, 255);
-      cv::drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, cv::Point() );
-      cv::circle( drawing, mc[i], 4, color, -1, 8, 0 );
+      //cv::Scalar color = cv::Scalar(0, 255, 255);
+      //cv::drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, cv::Point() );
+      //cv::circle( drawing, mc[i], 4, color, -1, 8, 0 );
 
-      addHole(mc[i].x, mc[i].y);
-    }
+      //addHole(mc[i].x, mc[i].y);
+    //}
+      Point center(cvRound(contours[i][0]), cvRound(contours[i][1]));
+      int radius = cvRound(contours[i][2]);
+      // circle center
+      circle( drawing, center, 3, Scalar(0,255,0), -1, 8, 0 );
+      // circle outline
+      circle( drawing, center, radius, Scalar(0,0,255), 3, 8, 0 );
+    
+    
   }
   return drawing;
 }
