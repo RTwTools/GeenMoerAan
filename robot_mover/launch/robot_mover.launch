@@ -1,0 +1,8 @@
+
+<launch>
+	<include file="$(find abb_irb120_moveit_config)/launch/moveit_planning_execution.launch"/>
+	<node 
+		name="robot_mover" 
+		pkg="robot_mover" 
+		type="robot_mover"/>
+</launch>
