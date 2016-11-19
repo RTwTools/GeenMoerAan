@@ -1,8 +1,0 @@
-
-<launch>
-	<include file="$(find abb_irb120_moveit_config)/launch/moveit_planning_execution.launch"/>
-	<node 
-		name="simulationV2" 
-		pkg="simulationV2" 
-		type="simulationv2"/>
-</launch>
