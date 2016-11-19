@@ -149,3 +149,12 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 CTestTestfile.cmake
+
+
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
