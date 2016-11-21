@@ -30,13 +30,19 @@ pose5= get_Pose(0.197, 0.165, 0.025,  0.707, -0.000, -0.707, 0.000); //5
   pathArray.poses.push_back(pose3);
   pathArray.poses.push_back(pose4);
   pathArray.poses.push_back(pose5);
+  pathArray.header.frame_id= "my_camera_view_link";
 
   publisher = n.advertise<geometry_msgs::PoseArray>(SUBSCRIBER_TOPIC, 1000);
-
-  sleep(1.0);
-  publisher.publish(pathArray);
+          ros::Rate rate(10);
+  while(ros::ok())
+  {
+    sleep(1.0);
+    publisher.publish(pathArray);
+    ros::spinOnce();
+    rate.sleep();
+  }
  
-  ros::spinOnce();
+ // ros::spinOnce();
 	return 0;
 }
 
