@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(simulationV2)
+project(robot_mover)
+
 
 
 ## Find catkin macros and libraries
@@ -186,7 +187,7 @@ set (SRCS1 ${SRCS1} src/Move_Node.cpp)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIRS})
 find_package(PkgConfig REQUIRED)
 pkg_search_module(EIGEN3 REQUIRED eigen3)
-add_executable(simulationv2 ${SRCS1})
-target_link_libraries(simulationv2 ${catkin_LIBRARIES}) 
+add_executable(robot_mover ${SRCS1})
+target_link_libraries(robot_mover ${catkin_LIBRARIES}) 
 add_executable(Path_Publisher src/Path_Publisher.cpp)
 target_link_libraries(Path_Publisher ${catkin_LIBRARIES}) 

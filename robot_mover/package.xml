@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>simulationV2</name>
+  <name>robot_mover</name>
   <version>0.0.0</version>
   <description>The simulationV2 package</description>
 
@@ -39,13 +39,12 @@
   <!--   <run_depend>message_runtime</run_depend> -->
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
-    <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>eigen</build_depend>
-  <run_depend>moveit_core</run_depend>
+  <buildtool_depend>catkin</buildtool_depend>
+	<run_depend>moveit_core</run_depend>
   <build_depend>laser_geometry</build_depend> 
-  <run_depend>laser_geometry</run_depend>
-<build_depend>tf</build_depend> 
-  <run_depend>tf</run_depend>
+	<run_depend>laser_geometry</run_depend>
+  <build_depend>tf</build_depend> 
+	<run_depend>tf</run_depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
