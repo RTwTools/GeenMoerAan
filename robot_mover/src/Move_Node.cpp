@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
   ros::init(argc, argv, nodeName);
   ros::NodeHandle n;
   moveit::planning_interface::MoveGroup group(GROUPID);
-  ros::Subscriber subHoles = n.subscribe(SUBSCRIBER_TOPIC, 1000, &holes_callBack);
+  ros::Subscriber subHoles = n.subscribe(SUBSCRIBER_TOPIC, 1, &holes_callBack);
 
   ros::AsyncSpinner spinner(1);
   spinner.start();
