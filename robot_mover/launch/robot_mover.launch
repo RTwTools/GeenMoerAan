@@ -1,8 +1,19 @@
-
 <launch>
-	<include file="$(find abb_irb120_moveit_config)/launch/moveit_planning_execution.launch"/>
-	<node 
-		name="robot_mover" 
-		pkg="robot_mover" 
-		type="robot_mover"/>
+  <!-- the "sim" argument controls whether we connect to a Simulated or Real robot -->
+  <!--  - if sim=false, a robot_ip argument is required -->
+  <arg name="sim" default="true" />
+ <arg name="robot_ip" default="192.168.1.10" unless="$(arg sim)" />
+ 
+  <group if="$(arg sim)">
+    <include file="$(find abb_irb120_moveit_config)/launch/moveit_planning_execution.launch"/>
+  </group>
+
+  <group unless="$(arg sim)">
+   	<include file="$(find abb_irb120_support)/launch/robot_interface_download_irb120.launch" >
+    	  <arg name="robot_ip" value="$(arg robot_ip)"/>
+    </include>
+  </group>
+  <node name="robot_mover" pkg="robot_mover" type="robot_mover"	output="screen" launch-prefix="xterm -e"
+	/>
 </launch>
+
