@@ -16,7 +16,7 @@
 #define SUBSCRIBER_BUFFER_SIZE 1000
 #define END_EFFECTOR "tool0"
 #define NODE_NAME "Move_Handler_Node"
-#define CAMERA_VIEW_FRAME "my_camera_view_link"
+#define CAMERA_VIEW_FRAME "camera_view_link"
 
 
 
