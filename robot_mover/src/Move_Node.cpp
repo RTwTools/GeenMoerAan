@@ -18,8 +18,6 @@
 #define NODE_NAME "Move_Handler_Node"
 #define CAMERA_VIEW_FRAME "camera_view_link"
 
-
-
 //Transform done between my_camera_view_link --> tool0
 using namespace std;
 
@@ -37,9 +35,12 @@ geometry_msgs::PoseArray pathArray;
 
 void holes_callBack(geometry_msgs::PoseArray posesMsg)
 {
+  if (!received && posesMsg.poses.size() != 0)
+  {
     ROS_INFO_STREAM("Path received !!");
     pathArray = posesMsg;
     received=true;
+  }
 }
 int main(int argc, char *argv[])
 {
@@ -54,23 +55,32 @@ int main(int argc, char *argv[])
   {   
       //Checking if a path was received and if the Robot isn't in activity
       if(received &&!running)
-      { running=true;
+      {
+        running=true;
       
-            // Moving to each goal pose
-            for(int i=0; i<pathArray.poses.size(); i++)
-            {
-                if (MoveToPose(&group, pathArray.poses[i]))
-                ROS_INFO_STREAM("  bolt Nr: " <<i+1<<" inserted !!!!!");
-                if(i==pathArray.poses.size()-1) {ROS_INFO_STREAM("All "<<i+1<< " holes closed !!!!!"); allHoles=true; received =false;}
-            }
+        // Moving to each goal pose
+        for(int i=0; i<pathArray.poses.size(); i++)
+        {
+          if (MoveToPose(&group, pathArray.poses[i]))
+            ROS_INFO_STREAM("  bolt Nr: " <<i+1<<" inserted !!!!!");
+          if(i==pathArray.poses.size()-1)
+          {
+            ROS_INFO_STREAM("All "<<i+1<< " holes closed !!!!!");
+            allHoles=true;
+          }
+        }
       }
       //Checking if All Bolts were inserted 
       if(allHoles)
       {
           if (MoveToPose(&group,get_Home_Pose()))
              ROS_INFO_STREAM(" *** Returned to Home ***");
+
+          pathArray.poses.clear();
           running= false;
           allHoles=false;
+          received =false;
+
       }
   }
   ros::waitForShutdown();

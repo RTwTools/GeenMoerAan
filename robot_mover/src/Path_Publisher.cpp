@@ -21,15 +21,15 @@ int main(int argc, char *argv[])
   geometry_msgs::PoseArray pathArray;
 
   //Poses gotten from transform: camera_view_link --> tool0
-  pose1 = get_Pose(0.214, 0.240, 0.089,0.707, -0.000, -0.707, 0.000);//1
-  pose2 = get_Pose(0.317, 0.183, 0.115, 0.707, -0.000, -0.707, 0.000);//Move back To Home
+  pose1 = get_Pose(0.2, 0.2, 0.05,0.707, -0.000, -0.707, 0.000);//1
+  /*pose2 = get_Pose(0.317, 0.183, 0.115, 0.707, -0.000, -0.707, 0.000);//Move back To Home
   pose3 = get_Pose(0.405, 0.170, 0.162,  0.707, -0.000, -0.707, 0.000);//4
-  pose4 = get_Pose(0.197, 0.165, 0.025,  0.707, -0.000, -0.707, 0.000); //5
+  pose4 = get_Pose(0.197, 0.165, 0.025,  0.707, -0.000, -0.707, 0.000); //5*/
         
   pathArray.poses.push_back(pose1);
-  pathArray.poses.push_back(pose2);
+  /*pathArray.poses.push_back(pose2);
   pathArray.poses.push_back(pose3);
-  pathArray.poses.push_back(pose4);
+  pathArray.poses.push_back(pose4);*/
   pathArray.header.frame_id= CAMERA_VIEW_FRAME;
 
   publisher = n.advertise<geometry_msgs::PoseArray>(SUBSCRIBER_TOPIC, 1);

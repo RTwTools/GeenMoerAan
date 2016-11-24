@@ -36,6 +36,8 @@ cv::Mat image, imageCropped;
 geometry_msgs::PoseArray holes;
 ros::Publisher pubHoles;
 
+bool viewCamera = false;
+
 
 // x and y in px
 void addHole(int px_x, int px_y)
@@ -54,7 +56,7 @@ void addHole(int px_x, int px_y)
   point.position.y = (mm_x / 1000);
   point.position.z = 0.01;
 
-  ROS_INFO("Added hole: x[%f], y[%f].",  point.position.x,  point.position.y);
+  ROS_DEBUG("Added hole: x[%f], y[%f].",  point.position.x,  point.position.y);
 
   holes.poses.push_back(point);
 }
@@ -135,8 +137,12 @@ int main(int argc, char *argv[])
     exit(1);
 
   //create window
-  //cv::namedWindow("Camera", CV_WINDOW_NORMAL);
-  //cv::resizeWindow("Camera", 960, 540);
+  if (viewCamera)
+  {
+    cv::namedWindow("Camera", CV_WINDOW_NORMAL);
+    cv::resizeWindow("Camera", 960, 540);
+  }
+
   cv::namedWindow("CameraCropped", CV_WINDOW_NORMAL);
   cv::resizeWindow("CameraCropped", 515, 540);
 
@@ -158,7 +164,8 @@ int main(int argc, char *argv[])
     //detect holes
     cv::Mat detected = detectHoles(&imageCropped);
 
-    //cv::imshow("Camera", imageU);
+    if(viewCamera)
+      cv::imshow("Camera", imageU);
     cv::imshow("CameraCropped", detected);
 
     if((cvWaitKey(40)&0xff)==ESC_KEY)
