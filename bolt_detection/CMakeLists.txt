@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(bolt_detection)
-
+#set(OpenCV_DIR /opt/ros/indigo/share/OpenCV-3.1.0-dev)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  OpenCV
   roslib
   roscpp
   std_msgs
@@ -61,9 +62,8 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package()
 
+include_directories(include ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} )
 
-include_directories(include ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS} )
-find_package( OpenCV REQUIRED)
 add_executable(bolt_detection_node src/bolt_detection.cpp)
 target_link_libraries(bolt_detection_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 add_dependencies(bolt_detection_node bolt_detection_gencpp)
