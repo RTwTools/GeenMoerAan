@@ -412,9 +412,15 @@
     </collision>
   </link>
   <joint name="camera_view_joint" type="fixed">
-    <origin rpy="0 1.187 -3.142" xyz="0.654 0.200 0.221"/>
-    <parent link="camera_link"/>
+    <origin rpy="0 0 0" xyz="0.06 0.11 0"/>
+    <parent link="base_link"/>
     <child link="camera_view_link"/>
   </joint>
   <link name="camera_view_link"/>
+  <!--joint name="camera_view_joint" type="fixed">
+        <origin xyz="0.654 0.200 0.221" rpy="0 1.187 -3.142"/>
+      <parent link="camera_link" />
+      <child link="camera_view_link"/>
+    </joint>
+    <link name="camera_view_link"/-->
 </robot>
