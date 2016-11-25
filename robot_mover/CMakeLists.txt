@@ -181,13 +181,13 @@ catkin_package(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-include_directories(include)
-set (SRCS1 ${SRCS1} include/MoveHandler.h src/MoveHandler.cpp)
-set (SRCS1 ${SRCS1} src/Move_Node.cpp)
+include_directories(include/)
+set (SRCS1 ${SRCS1} include/move_handler.h src/move_handler.cpp)
+set (SRCS1 ${SRCS1} src/move_node.cpp)
 include_directories(SYSTEM ${Boost_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIRS})
 find_package(PkgConfig REQUIRED)
 pkg_search_module(Eigen3 REQUIRED eigen3)
 add_executable(robot_mover ${SRCS1})
 target_link_libraries(robot_mover ${catkin_LIBRARIES}) 
-add_executable(Path_Publisher src/Path_Publisher.cpp)
-target_link_libraries(Path_Publisher ${catkin_LIBRARIES}) 
+add_executable(path_publisher src/path_publisher.cpp)
+target_link_libraries(path_publisher ${catkin_LIBRARIES}) 

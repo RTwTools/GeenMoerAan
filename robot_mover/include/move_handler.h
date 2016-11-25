@@ -9,20 +9,20 @@
 #include "tf/transform_datatypes.h"
 
 
- class MoveHandler
+ class move_handler
 {
 
 private: 
 	moveit::planning_interface::MoveGroup *group;
 	ros::Publisher *publisher;
-	nav_msgs::Path Cordinates;
+	nav_msgs::Path Coordinates;
 	tf::TransformListener *listener;
 
 
 
 public:
 
-	MoveHandler(ros::Publisher *publisher,moveit::planning_interface::MoveGroup *_group, tf::TransformListener * listener);
+	move_handler(ros::Publisher *publisher,moveit::planning_interface::MoveGroup *_group, tf::TransformListener * listener);
 	//~MoveHandler();
 	bool Move(geometry_msgs::Pose pose) ;
 	void  set_Path(const nav_msgs::Path path);
