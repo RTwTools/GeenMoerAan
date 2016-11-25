@@ -24,13 +24,13 @@
 #define CAMERA_FRAME "camera_view_link"
 #define PACKAGE_NAME "bolt_detection"
 
-class BoltDetector
+class bolt_detector
 {
 public:
   // members
 
   // methods
-  BoltDetector();
+  bolt_detector();
   bool GetStatus();
 
 protected:
