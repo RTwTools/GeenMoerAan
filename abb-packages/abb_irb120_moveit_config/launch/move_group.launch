@@ -4,7 +4,7 @@
 
   <!-- GDB Debug Option -->
   <arg name="debug" default="false" />
-  <arg unless="$(arg debug)" name="launch_prefix" value="" />
+  <arg unless="$(arg debug)" name="launch_prefix" value="xterm -e" />
   <arg     if="$(arg debug)" name="launch_prefix" value="gdb --ex run --args" />
 
   <!-- Verbose Mode Option -->

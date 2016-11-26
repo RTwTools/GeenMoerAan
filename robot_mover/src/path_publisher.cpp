@@ -3,8 +3,10 @@
 #include "nav_msgs/Path.h"
 #include "geometry_msgs/PoseStamped.h"
 #include <geometry_msgs/PoseArray.h>
+
 #define PUBLISHER_TOPIC "holes"
-#define NODE_NAME  "Path_Publisher"
+#define NODE_NAME  "path_publisher"
+
 #define CAMERA_VIEW_FRAME "camera_view_link"
 
 
