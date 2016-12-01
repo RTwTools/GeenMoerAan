@@ -41,14 +41,14 @@ protected:
   ros::Publisher pubHoles_;
   geometry_msgs::PoseArray holes_;
 
-  int cameraID_;
+  int cameraId_;
   bool viewCamera_;
-  bool initStatus_;
+  bool status_;
 
   cv::VideoCapture camera_;
   cv::Mat cameraMatrix_, distCoeffs_;
   cv::Mat transformMatrix_;
-  cv::Mat image_, imageCropped_;
+  cv::Mat image_, imageUndistorted_, imageCropped_, imageDetected_;
   cv::Size usedResolution_, calibratedResolution_;
 
   // method
@@ -57,6 +57,8 @@ protected:
   void ShowWindows();
   bool ReadCalibrationData(std::string fileName);
   bool ReadTransformData(std::string fileName);
+  void AddHole(int px_x, int px_y);
+  bool ProcessImage();
 };
 
 

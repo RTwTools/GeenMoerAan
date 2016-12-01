@@ -1,6 +1,0 @@
-<launch>
-
-<node pkg="bolt_detection" name="bolt_detector" type="bolt_detection_node" required="true" output="screen"/>
-
-</launch>
-
