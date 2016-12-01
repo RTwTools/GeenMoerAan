@@ -32,6 +32,8 @@ public:
   // methods
   bolt_detector();
   bool GetStatus();
+  void DetectHoles();
+  void SendHoles();
 
 protected:
   // members
@@ -39,7 +41,6 @@ protected:
   ros::Publisher pubHoles_;
   geometry_msgs::PoseArray holes_;
 
-  int rate_;
   int cameraID_;
   bool viewCamera_;
   bool initStatus_;
@@ -53,6 +54,7 @@ protected:
   // method
   bool OpenCamera();
   void CreateWindows();
+  void ShowWindows();
   bool ReadCalibrationData(std::string fileName);
   bool ReadTransformData(std::string fileName);
 };

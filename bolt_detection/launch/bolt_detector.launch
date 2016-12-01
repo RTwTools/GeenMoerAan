@@ -1,0 +1,9 @@
+<launch>
+
+  <node pkg="bolt_detection" name="bolt_detector" type="boltdetector" output="screen">
+    <param name="view_camera" value="false" />
+    <param name="camera_ID" value="0" />
+  </node>
+
+</launch>
+

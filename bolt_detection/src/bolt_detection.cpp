@@ -36,7 +36,7 @@ cv::Mat image, imageCropped;
 geometry_msgs::PoseArray holes;
 ros::Publisher pubHoles;
 
-bool viewCamera = false;
+bool viewCamera = true;
 
 
 // x and y in px
@@ -166,10 +166,15 @@ int main(int argc, char *argv[])
 
     if(viewCamera)
       cv::imshow("Camera", imageU);
+
     cv::imshow("CameraCropped", detected);
 
     if((cvWaitKey(40)&0xff)==ESC_KEY)
     {
+      //save image
+      std::string pathname = ros::package::getPath("bolt_detection") + "/image.jpg";
+      imwrite(pathname, imageCropped);
+
       std::cout << "---------------------------------------------" << std::endl;
       cv::destroyWindow("Camera");
       cv::destroyWindow("CameraCropped");

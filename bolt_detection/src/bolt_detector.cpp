@@ -2,12 +2,10 @@
 
 bolt_detector::bolt_detector() :
   ph_("~"),
-  rate_(30),
   viewCamera_(false),
   cameraID_(1),
   initStatus_(false)
 {
-  ph_.param("publish_rate", rate_, rate_);
   ph_.param("view_camera", viewCamera_, viewCamera_);
   ph_.param("camera_ID", cameraID_, cameraID_);
 
@@ -95,10 +93,29 @@ bool bolt_detector::OpenCamera()
   return true;
 }
 
+void bolt_detector::ShowWindows()
+{
+  if (viewCamera_)
+  {
+    //TODO
+  }
+}
+
+void bolt_detector::DetectHoles()
+{
+  //TODO
+}
+
+void bolt_detector::SendHoles()
+{
+  //TODO
+}
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "PACKAGE_NAME");
   bolt_detector boltDetector;
+  ros::Rate r(30);
 
   //check if boltDetector loaded correctly
   if (!boltDetector.GetStatus())
@@ -106,11 +123,13 @@ int main(int argc, char **argv)
 
   ROS_INFO("Bolt Detection Node Started!");
 
+  while(ros::ok())
+  {
+    boltDetector.DetectHoles();
 
-
-  //....
-  //detect the holes and do other stuff...
-  //....
+    ros::spinOnce();
+    r.sleep();
+  }
 
   return 0;
 }
