@@ -65,10 +65,6 @@ catkin_package()
 include_directories(include ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS} )
 find_package( OpenCV REQUIRED)
 
-add_executable(bolt_detection_node src/bolt_detection.cpp)
-target_link_libraries(bolt_detection_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
-add_dependencies(bolt_detection_node bolt_detection_gencpp)
-
 add_executable(boltdetector src/bolt_detector.cpp)
 target_link_libraries(boltdetector ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 add_dependencies(boltdetector bolt_detection_gencpp)

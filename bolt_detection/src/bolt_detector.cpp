@@ -16,6 +16,9 @@ bolt_detector::bolt_detector() :
   if (status_) status_ = ReadCalibrationData(CALIBRATION_FILE_NAME);
   if (status_) status_ = ReadTransformData(TRANSFORM_FILE_NAME);
   if (status_) CreateWindows();
+
+  //TODO add timer to send holes
+  //timer_ = nh_.createTimer(ros::Duration(1.0/rate_), boost::bind(&CruiseBehavior::update, this));
 }
 
 bool bolt_detector::ReadTransformData(std::string fileName)
