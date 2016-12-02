@@ -4,10 +4,14 @@ bolt_detector::bolt_detector() :
   ph_("~"),
   viewCamera_(false),
   cameraId_(1),
-  status_(false)
+  status_(false),
+  publish_rate_(5),
+  gui_(false)
 {
   ph_.param("view_camera", viewCamera_, viewCamera_);
   ph_.param("camera_ID", cameraId_, cameraId_);
+  ph_.param("gui", gui_, gui_);
+  ph_.param("publish_rate_s", publish_rate_, publish_rate_);
 
   pubHoles_ = nh_.advertise<geometry_msgs::PoseArray>("/holes", 1);
 
@@ -17,8 +21,14 @@ bolt_detector::bolt_detector() :
   if (status_) status_ = ReadTransformData(TRANSFORM_FILE_NAME);
   if (status_) CreateWindows();
 
-  //TODO add timer to send holes
-  //timer_ = nh_.createTimer(ros::Duration(1.0/rate_), boost::bind(&CruiseBehavior::update, this));
+  if (gui_)
+  {
+    //add subscriber to topic
+  }
+  else
+  {
+    timer_ = nh_.createTimer(ros::Duration(publish_rate_), boost::bind(&bolt_detector::SendHoles, this));
+  }
 }
 
 bool bolt_detector::ReadTransformData(std::string fileName)

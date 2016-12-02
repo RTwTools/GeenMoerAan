@@ -2,10 +2,14 @@
 
  <arg name="view_camera" default="false" />
  <arg name="camera_id" default="1" />
+ <arg name="gui" default="false" />
+ <arg name="publish_rate_s" default="5" />
 
   <node pkg="bolt_detection" name="bolt_detector" type="boltdetector" output="screen">
     <param name="view_camera" value="$(arg view_camera)" />
-    <param name="camera_id" value="$(arg camera_id" />
+    <param name="camera_id" value="$(arg camera_id)" />
+    <param name="gui" value="$(arg gui)" />
+    <param name="publish_rate_s" value="$(arg publish_rate_s)" />
   </node>
 
 </launch>

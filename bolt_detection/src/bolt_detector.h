@@ -39,11 +39,14 @@ protected:
   // members
   ros::NodeHandle nh_, ph_;
   ros::Publisher pubHoles_;
+  ros::Timer timer_;
   geometry_msgs::PoseArray holes_;
 
+  int publish_rate_;
   int cameraId_;
   bool viewCamera_;
   bool status_;
+  bool gui_;
 
   cv::VideoCapture camera_;
   cv::Mat cameraMatrix_, distCoeffs_;
