@@ -1,6 +1,4 @@
-# Geen moer aan
-
-## Minor project Geen moer aan.
+# Minor project Geen moer aan.
 
 ### ROS Installation
 
@@ -20,7 +18,7 @@ echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-###Setting up workspace
+### Setting up workspace
 
 ```
 cd ~
@@ -33,13 +31,13 @@ echo "source /home/[username]/workspace/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-###Installing project dependencies
+### Installing project dependencies
 
 ``` 
 sudo apt-get install ros-indigo-moveit-full ros-indigo-abb-driver ros-indigo-controller-manager ros-indigo-opencv3 ros-indigo-industrial-robot-simulator
 ```
 
-###Installing project
+### Installing project
 
 ```
 cd src
