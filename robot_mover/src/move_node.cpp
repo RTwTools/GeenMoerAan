@@ -12,14 +12,9 @@ int main(int argc, char *argv[]) {
     moveit::planning_interface::MoveGroup group(GROUPID);
     move_handler *obj = new move_handler(&group);
     ros::Subscriber sub = n.subscribe(SUBSCRIBER_TOPIC, SUBSCRIBER_BUFFER_SIZE, &move_handler::onHolesMessageReceived, obj);
-
-    while (ros::ok()) {
-
-        obj->processMove();
-
-    }
-    ros::waitForShutdown();
-
+    
+    ros::spin();
+    
     return 0;
 }
 
