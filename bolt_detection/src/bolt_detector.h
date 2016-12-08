@@ -40,6 +40,7 @@ protected:
   // members
   ros::NodeHandle nh_, ph_;
   ros::Publisher pubHoles_;
+  ros::Subscriber subGUI_;
   ros::Timer timer_;
   geometry_msgs::PoseArray holes_;
 
@@ -63,6 +64,7 @@ protected:
   bool ReadTransformData(std::string fileName);
   void AddHole(int px_x, int px_y);
   bool ProcessImage();
+  void GuiCB(const bolt_detection::Detection::ConstPtr &gui_msg);
 };
 
 

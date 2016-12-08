@@ -22,13 +22,10 @@ bolt_detector::bolt_detector() :
   if (status_) CreateWindows();
 
   if (gui_)
-  {
-    //add subscriber to topic
-  }
+    //scan_sub_ = nh_.subscribe<sensor_msgs::LaserScan>("/scan", 100, &EscapeBehavior::scanCallback, this);
+    subGUI_ = nh_.subscribe<bolt_detection::Detection>("/detect_cmd", 1, &bolt_detector::GuiCB, this);
   else
-  {
     timer_ = nh_.createTimer(ros::Duration(publish_rate_), boost::bind(&bolt_detector::SendHoles, this));
-  }
 }
 
 bool bolt_detector::ReadTransformData(std::string fileName)
@@ -220,6 +217,12 @@ void bolt_detector::SendHoles()
   //cv::imwrite(pathname, imageCropped_);
 
   ROS_INFO("Sent %i holes.", (int)holes_.poses.size());
+}
+
+void bolt_detector::GuiCB(const bolt_detection::Detection::ConstPtr &gui_msg)
+{
+  if (!gui_msg->detect) return;
+  SendHoles();
 }
 
 int main(int argc, char **argv)
