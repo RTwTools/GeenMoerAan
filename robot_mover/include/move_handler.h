@@ -11,37 +11,35 @@
 #include <time.h>
 #include <string.h>
 
-#define SUBSCRIBER_TOPIC "holes"
-#define GROUPID "manipulator"
-#define SUBSCRIBER_BUFFER_SIZE 1
-#define END_EFFECTOR "tool0"
-#define NODE_NAME "Move_Handler_Node"
-#define CAMERA_VIEW_FRAME "camera_view_link"
-#define ROBOT_FRAME "base_link"
+#define SUBSCRIBER_TOPIC          "holes"
+#define GROUPID                   "manipulator"
+#define SUBSCRIBER_BUFFER_SIZE    1
+#define END_EFFECTOR              "tool0"
+#define NODE_NAME                 "Move_Handler_Node"
+#define CAMERA_VIEW_FRAME         "camera_view_link"
+#define ROBOT_FRAME               "base_link"
+
 using namespace std;
- class move_handler
+
+class move_handler
 {
 
 private: 
-	moveit::planning_interface::MoveGroup *group;
-	bool received;
-	bool allHoles;
-	bool running;
-	geometry_msgs::PoseArray pathArray;
+  moveit::planning_interface::MoveGroup *group;
+  bool received;
+  bool allHoles;
+  bool running;
+  geometry_msgs::PoseArray pathArray;
 
 
 
 public:
-
-	move_handler(moveit::planning_interface::MoveGroup *_group );
-	bool MoveToPose( geometry_msgs::Pose pose);
-	geometry_msgs::Pose get_Pose(double pX, double pY, double pZ, double oX, double oY, double oZ, double oW);
-	geometry_msgs::Pose get_Home_Pose();
-	void onHolesMessageReceived(geometry_msgs::PoseArray posesMsg);
-	void processMove();
-	//~move_handler();
-
-
+  move_handler(moveit::planning_interface::MoveGroup *_group );
+  bool MoveToPose( geometry_msgs::Pose pose);
+  geometry_msgs::Pose get_Pose(double pX, double pY, double pZ, double oX, double oY, double oZ, double oW);
+  geometry_msgs::Pose get_Home_Pose();
+  void onHolesMessageReceived(geometry_msgs::PoseArray posesMsg);
+  void processMove();
 
 };
 #endif
