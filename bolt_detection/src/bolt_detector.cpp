@@ -9,7 +9,7 @@ bolt_detector::bolt_detector() :
   gui_(false)
 {
   ph_.param("view_camera", viewCamera_, viewCamera_);
-  ph_.param("camera_ID", cameraId_, cameraId_);
+  ph_.param("camera_id", cameraId_, cameraId_);
   ph_.param("gui", gui_, gui_);
   ph_.param("publish_rate_s", publish_rate_, publish_rate_);
 
@@ -40,8 +40,6 @@ bool bolt_detector::ReadTransformData(std::string fileName)
     ROS_ERROR("Failed to open [%s].", fileName.c_str());
     return false;
   }
-  //TODO check if needed:
-  //transformMatrix_ = cv::Mat(3,3,CV_32FC1);
 
   fs["transform_matrix"] >> transformMatrix_;
 
@@ -83,7 +81,6 @@ void bolt_detector::CreateWindows()
     cv::resizeWindow("Camera", 960, 540);
     cv::namedWindow("CameraCropped", CV_WINDOW_NORMAL);
     cv::resizeWindow("CameraCropped", 515, 540);
-
   }
   cv::namedWindow("DetectedHoles", CV_WINDOW_NORMAL);
   cv::resizeWindow("DetectedHoles", 515, 540);
@@ -160,6 +157,7 @@ bool bolt_detector::ProcessImage()
   if (perspectiveImage.rows < IMAGE_WIDTH_PX || perspectiveImage.cols < IMAGE_HEIGHT_PX)
   {
     ROS_ERROR("Can't transform image, camera resolution is too small!");
+    status_ = false;
     return false;
   }
   imageCropped_ = perspectiveImage(cv::Rect(0, 0, IMAGE_WIDTH_PX, IMAGE_HEIGHT_PX));
@@ -217,6 +215,10 @@ void bolt_detector::SendHoles()
   holes_.header.stamp = ros::Time::now();
   pubHoles_.publish(holes_);
 
+  //save image
+  //std::string pathname = ros::package::getPath("bolt_detection") + "/resources/image.png";
+  //cv::imwrite(pathname, imageCropped_);
+
   ROS_INFO("Sent %i holes.", (int)holes_.poses.size());
 }
 
@@ -236,12 +238,8 @@ int main(int argc, char **argv)
   {
     boltDetector.DetectHoles();
 
-    if((cvWaitKey(40)&0xff)==ESC_KEY)
+    if((char)cv::waitKey(40)==ESC_KEY)
     {
-      //save image
-      //std::string pathname = ros::package::getPath("bolt_detection") + "/image.jpg";
-      //imwrite(pathname, imageCropped);
-
       std::cout << "---------------------------------------------" << std::endl;
       cv::destroyWindow("Camera");
       cv::destroyWindow("CameraCropped");
