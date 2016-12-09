@@ -227,6 +227,7 @@ void bolt_detector::GuiCB(const bolt_detection::Detection::ConstPtr &gui_msg)
 
 int main(int argc, char **argv)
 {
+    std::cout << "OpenCV version : " << CV_VERSION << std::endl;
   ros::init(argc, argv, "PACKAGE_NAME");
   bolt_detector boltDetector;
   ros::Rate r(30);
