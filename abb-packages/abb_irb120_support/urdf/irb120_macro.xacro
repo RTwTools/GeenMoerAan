@@ -152,17 +152,16 @@
       </collision>
     </link>
   <link name="${prefix}tool0">
-    <mass value="0.200"/>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <visual>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="-0.077 0 0"/>
       <geometry>
-        <box size="0.1 0.045 0.035"/>
+        <box size="0.155 0.005 0.005"/>
       </geometry>
         <material name="orange"/>
     </visual>
   </link>    
-<link name="${prefix}left_gripper_link">
+<!--link name="${prefix}left_gripper_link">
         <visual>
             <geometry>
                 <box size="0.03 0.015 0.015" />
@@ -179,7 +178,7 @@
         <color rgba="0.1882353 0.1960784 0.2039216 1"/>
       </material>
         </visual>        
-    </link>
+    </link-->
     <!-- end of link list -->
 
     <!-- joint list -->
@@ -234,9 +233,9 @@
     <joint name="${prefix}joint6-tool0" type="fixed">
       <parent link="${prefix}link_6"/>
       <child link="${prefix}tool0"/>
-    <origin rpy="0 0 0" xyz="0.0505 0 0"/>
+    <origin rpy="0 0 0" xyz="0.155 0 0"/>
     </joint>
-  <joint name="${prefix}left_gripper_joint" type="prismatic">
+  <!--joint name="${prefix}left_gripper_joint" type="prismatic">
     <parent link="${prefix}tool0"/>
     <child link="${prefix}left_gripper_link"/>
     <axis xyz="0 1 0"/>
@@ -250,7 +249,7 @@
     <limit lower="-0.02" upper="-0.01" effort="0" velocity="1" />   
     <origin rpy="0 0 0" xyz="0.0505 0 0"/>
     <mimic joint="${prefix}left_gripper_joint" multiplier="-1" />
-  </joint>
+  </joint-->
     <!-- end of joint list -->
 
     <!-- ROS base_link to ABB World Coordinates transform -->

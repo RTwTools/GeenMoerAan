@@ -200,34 +200,33 @@
     </collision>
   </link>
   <link name="tool0">
-    <mass value="0.200"/>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <visual>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="-0.077 0 0"/>
       <geometry>
-        <box size="0.1 0.045 0.035"/>
+        <box size="0.155 0.005 0.005"/>
       </geometry>
       <material name="orange"/>
     </visual>
   </link>
-  <link name="left_gripper_link">
-    <visual>
-      <geometry>
-        <box size="0.03 0.015 0.015"/>
-      </geometry>
-      <material name="orange"/>
-    </visual>
-  </link>
-  <link name="right_gripper_link">
-    <visual>
-      <geometry>
-        <box size="0.03 0.015 0.015"/>
-      </geometry>
-      <material name="orange">
+  <!--link name="${prefix}left_gripper_link">
+        <visual>
+            <geometry>
+                <box size="0.03 0.015 0.015" />
+            </geometry>        
+        <material name="orange"/>
+        </visual>        
+    </link>
+<link name="${prefix}right_gripper_link">
+        <visual>
+            <geometry>
+                <box size="0.03 0.015 0.015" />
+            </geometry>      
+        <material name="orange">
         <color rgba="0.1882353 0.1960784 0.2039216 1"/>
       </material>
-    </visual>
-  </link>
+        </visual>        
+    </link-->
   <!-- end of link list -->
   <!-- joint list -->
   <joint name="joint_1" type="revolute">
@@ -281,23 +280,23 @@
   <joint name="joint6-tool0" type="fixed">
     <parent link="link_6"/>
     <child link="tool0"/>
-    <origin rpy="0 0 0" xyz="0.0505 0 0"/>
+    <origin rpy="0 0 0" xyz="0.155 0 0"/>
   </joint>
-  <joint name="left_gripper_joint" type="prismatic">
-    <parent link="tool0"/>
-    <child link="left_gripper_link"/>
+  <!--joint name="${prefix}left_gripper_joint" type="prismatic">
+    <parent link="${prefix}tool0"/>
+    <child link="${prefix}left_gripper_link"/>
     <axis xyz="0 1 0"/>
-    <limit effort="0" lower="-0.02" upper="-0.01" velocity="1"/>
+    <limit lower="-0.02" upper="-0.01" effort="0" velocity="1" />   
     <origin rpy="0 0 0" xyz="0.0505 0 0"/>
   </joint>
-  <joint name="right_gripper_joint" type="prismatic">
-    <parent link="tool0"/>
-    <child link="right_gripper_link"/>
+  <joint name="${prefix}right_gripper_joint" type="prismatic">
+    <parent link="${prefix}tool0"/>
+    <child link="${prefix}right_gripper_link"/>
     <axis xyz="0 1 0"/>
-    <limit effort="0" lower="-0.02" upper="-0.01" velocity="1"/>
+    <limit lower="-0.02" upper="-0.01" effort="0" velocity="1" />   
     <origin rpy="0 0 0" xyz="0.0505 0 0"/>
-    <mimic joint="left_gripper_joint" multiplier="-1"/>
-  </joint>
+    <mimic joint="${prefix}left_gripper_joint" multiplier="-1" />
+  </joint-->
   <!-- end of joint list -->
   <!-- ROS base_link to ABB World Coordinates transform -->
   <link name="base"/>
