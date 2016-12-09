@@ -154,12 +154,18 @@
   <link name="${prefix}tool0">
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <visual>
-      <origin rpy="0 0 0" xyz="-0.077 0 0"/>
+      <origin rpy="0 0 0" xyz="-0.062 0 0"/>
       <geometry>
-        <box size="0.155 0.005 0.005"/>
+        <box size="0.125 0.005 0.005"/>
       </geometry>
         <material name="orange"/>
     </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.062 0 0"/>
+      <geometry>
+        <box size="0.125 0.005 0.005"/>
+      </geometry>
+      </collision>
   </link>    
 <!--link name="${prefix}left_gripper_link">
         <visual>
@@ -233,7 +239,7 @@
     <joint name="${prefix}joint6-tool0" type="fixed">
       <parent link="${prefix}link_6"/>
       <child link="${prefix}tool0"/>
-    <origin rpy="0 0 0" xyz="0.155 0 0"/>
+    <origin rpy="0 0 0" xyz="0.125 0 0"/>
     </joint>
   <!--joint name="${prefix}left_gripper_joint" type="prismatic">
     <parent link="${prefix}tool0"/>
