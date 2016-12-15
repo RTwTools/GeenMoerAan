@@ -158,6 +158,7 @@ bool bolt_detector::ProcessImage()
     return false;
   }
   imageCropped_ = perspectiveImage(cv::Rect(0, 0, IMAGE_WIDTH_PX, IMAGE_HEIGHT_PX));
+  return true;
 }
 
 void bolt_detector::DetectHoles()
