@@ -26,9 +26,6 @@ class move_handler
 
 private: 
   moveit::planning_interface::MoveGroup *group;
-  bool received;
-  bool allHoles;
-  bool running;
   geometry_msgs::PoseArray pathArray;
 
 
@@ -36,10 +33,9 @@ private:
 public:
   move_handler(moveit::planning_interface::MoveGroup *_group );
   bool MoveToPose( geometry_msgs::Pose pose);
-  geometry_msgs::Pose get_Pose(double pX, double pY, double pZ, double oX, double oY, double oZ, double oW);
-  geometry_msgs::Pose get_Home_Pose();
+  geometry_msgs::Pose getPose(double pX, double pY, double pZ, double oX, double oY, double oZ, double oW);
+  geometry_msgs::Pose getHomePose();
   void onHolesMessageReceived(geometry_msgs::PoseArray posesMsg);
-  void processMove();
 
 };
 #endif

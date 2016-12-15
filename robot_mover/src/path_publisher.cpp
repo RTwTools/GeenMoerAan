@@ -22,9 +22,9 @@ int main(int argc, char *argv[]) {
     geometry_msgs::PoseArray pathArray;
 
     //Poses gotten from transform: camera_view_link --> tool0
-    pose1 = get_Pose(0.2, 0.2, 0.05, 0.707, -0.000, -0.707, 0.000); //1
-    pose2 = get_Pose(0.405, 0.170, 0.162, 0.707, -0.000, -0.707, 0.000); //2
-    pose3 = get_Pose(0.197, 0.165, 0.025, 0.707, -0.000, -0.707, 0.000); //3
+    pose1 = get_Pose(0.1, 0.15, 0.005, 0.707, -0.000, -0.707, 0.000); //1
+    pose2 = get_Pose(0.15, 0.2, 0.005, 0.707, -0.000, -0.707, 0.000); //2
+    pose3 = get_Pose(0.2, 0.1, 0.005, 0.707, -0.000, -0.707, 0.000); //3
 
     pathArray.poses.push_back(pose1);
     pathArray.poses.push_back(pose2);
