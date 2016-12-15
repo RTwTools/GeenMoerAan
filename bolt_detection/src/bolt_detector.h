@@ -3,8 +3,7 @@
 
 #include <ros/ros.h>
 #include <ros/package.h>
-#include <ros/package.h>
-#include <geometry_msgs/PoseArray.h>
+#include <nav_msgs/Path.h>
 #include <opencv2/opencv.hpp>
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -40,7 +39,7 @@ protected:
   ros::NodeHandle nh_, ph_;
   ros::Publisher pubHoles_;
   ros::Timer timer_;
-  geometry_msgs::PoseArray holes_;
+  nav_msgs::Path holes_;
 
   int publish_rate_;
   int cameraId_;

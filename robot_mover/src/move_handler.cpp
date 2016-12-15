@@ -2,8 +2,10 @@
 
 move_handler::move_handler(moveit::planning_interface::MoveGroup *_group) :
 group(_group) {
+    group->setGoalTolerance(0.005);
     group->setGoalPositionTolerance(0.00000001);
     group->setEndEffectorLink(END_EFFECTOR);
+
 }
 
 //This Function moves the Robot to a specific goal
@@ -31,8 +33,12 @@ void move_handler::onHolesMessageReceived(const nav_msgs::Path pathMsg) {
 
         // Moving to each goal pose
         for (int i = 0; i < pathArray.poses.size(); i++) {
-            if (MoveToPose(translatePose(pathArray.poses[i]).pose))
-                ROS_INFO_STREAM("Bolt number: " << i + 1 << " inserted.");
+            geometry_msgs::PoseStamped p = pathArray.poses[i];
+            p.pose.position.z += 0.075;
+            if (MoveToPose(translatePose(p).pose))
+                if (MoveToPose(translatePose(pathArray.poses[i]).pose))
+                    if (MoveToPose(translatePose(p).pose))
+                        ROS_INFO_STREAM("Bolt number: " << i + 1 << " inserted.");
         }
         ROS_INFO_STREAM("All " << pathArray.poses.size() << " holes closed !");
         goHome();
@@ -56,7 +62,7 @@ geometry_msgs::Pose move_handler::getPose(double pX, double pY, double pZ, doubl
 // Returns 0 0 0 pose
 
 void move_handler::goHome() {
-    MoveToPose(getPose(0.25, 0.25, 0.60, -0.00287761, 0.00757816, 0.353165, 0.935526));
+    MoveToPose(getPose(0.22, 0.29, 0.60, -0.1047, -0.0367, 0.4414, 0.8904));
 }
 
 geometry_msgs::PoseStamped move_handler::translatePose(geometry_msgs::PoseStamped poseStamped) {
