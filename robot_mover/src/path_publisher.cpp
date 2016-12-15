@@ -1,8 +1,7 @@
-#include "ros/ros.h"
-#include "geometry_msgs/Pose.h"
-#include "nav_msgs/Path.h"
-#include "geometry_msgs/PoseStamped.h"
-#include <geometry_msgs/PoseArray.h>
+#include <ros/ros.h>
+#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <nav_msgs/Path.h>
 
 #define PUBLISHER_TOPIC "holes"
 #define NODE_NAME  "path_publisher"
@@ -18,20 +17,24 @@ int main(int argc, char *argv[]) {
     ros::init(argc, argv, NODE_NAME);
     ros::NodeHandle n;
 
-    geometry_msgs::Pose pose1, pose2, pose3;
-    geometry_msgs::PoseArray pathArray;
+    geometry_msgs::PoseStamped pose1, pose2, pose3;
+    nav_msgs::Path pathArray;
+
+    pose1.header.frame_id = CAMERA_VIEW_FRAME;
+    pose2.header.frame_id = CAMERA_VIEW_FRAME;
+    pose3.header.frame_id = CAMERA_VIEW_FRAME;
 
     //Poses gotten from transform: camera_view_link --> tool0
-    pose1 = get_Pose(0.1, 0.15, 0.005, 0.707, -0.000, -0.707, 0.000); //1
-    pose2 = get_Pose(0.15, 0.2, 0.005, 0.707, -0.000, -0.707, 0.000); //2
-    pose3 = get_Pose(0.2, 0.1, 0.005, 0.707, -0.000, -0.707, 0.000); //3
+    pose1.pose = get_Pose(0.1, 0.15, 0.005, 0.707, -0.000, -0.707, 0.000); //1
+    pose2.pose = get_Pose(0.15, 0.2, 0.005, 0.707, -0.000, -0.707, 0.000); //2
+    pose3.pose = get_Pose(0.2, 0.1, 0.005, 0.707, -0.000, -0.707, 0.000); //3
 
     pathArray.poses.push_back(pose1);
     pathArray.poses.push_back(pose2);
     pathArray.poses.push_back(pose3);
     pathArray.header.frame_id = CAMERA_VIEW_FRAME;
 
-    publisher = n.advertise<geometry_msgs::PoseArray>(PUBLISHER_TOPIC, 1);
+    publisher = n.advertise<nav_msgs::Path>(PUBLISHER_TOPIC, 1);
     ros::Rate rate(1);
 
     while (ros::ok()) {
