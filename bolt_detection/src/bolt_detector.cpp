@@ -81,12 +81,13 @@ void bolt_detector::CreateWindows() {
     cvCreateTrackbar("HighH", "DetectedHoles", &iHighH, 510);
     //
     //    cvCreateTrackbar("LowS", "DetectedHoles", &iLowS, 500); //Hue (0 - 179)
-    //    cvCreateTrackbar("HighS", "DetectedHoles", &iHighS, 500);
+    cvCreateTrackbar("HighS", "DetectedHoles", &iHighS, 1000);
 
     cv::resizeWindow("DetectedHoles", 515, 540);
 }
 
 bool bolt_detector::OpenCamera() {
+    //    camera_.open("/home/tycho/Documents/Fontys/ROB/workspace/src/geen-moer-aan/bolt_detection/src/my_video-2.avi");
     camera_.open(cameraId_);
     if (!camera_.isOpened()) {
         ROS_INFO("Could not open camera ID [%d].", cameraId_);
@@ -166,17 +167,20 @@ void bolt_detector::DetectHoles() {
     std::vector<cv::Vec4i> hierarchy;
 
     cv::cvtColor(imageCropped_, imageGray, CV_BGR2GRAY);
-    blur(imageGray, imageGray, Size(3, 3));
-    cv::Canny(imageCropped_, cannyOutput, iLowH, iHighH, 3);
-    int dilation_size = 5;
+    GaussianBlur(imageGray, imageGray, Size(3, 3), 1);
+    //    cv::imshow("Camera", imageGray);
+    cv::Canny(imageGray, cannyOutput, iLowH, iHighH, 3);
+    int dilation_size = 9;
     Mat element = getStructuringElement(MORPH_ELLIPSE,
             Size(2 * dilation_size + 1, 2 * dilation_size + 1),
             Point(dilation_size, dilation_size));
-    for (int i = 0; i < 3; i++) {
+
+    for (int i = 0; i < 1; i++) {
         dilate(cannyOutput, cannyOutput, element);
         erode(cannyOutput, cannyOutput, element);
     }
-//    cv::imshow("Camera", cannyOutput);
+
+    cv::imshow("Camera", cannyOutput);
     cv::findContours(cannyOutput, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
     holes_.poses.clear();
@@ -197,7 +201,7 @@ void bolt_detector::DetectHoles() {
     imageDetected_ = cv::Mat::zeros(cannyOutput.size(), CV_8UC3);
 
     for (int i = 0; i < contours.size(); i++) {
-        if (mu[i].m00 > 10) {
+        if (mu[i].m00 > 80 && mu[i].m00 < 650) {
             //            printf(" * Contour[%d] - Area (M_00) = %.2f - Area OpenCV: %.2f - Length: %.2f \n", i, mu[i].m00, contourArea(contours[i]), arcLength( contours[i], true ) );
             cv::Scalar color = cv::Scalar(0, 255, 255);
             cv::drawContours(imageDetected_, contours, i, color, 2, 8, hierarchy, 0, cv::Point());
@@ -228,12 +232,11 @@ int main(int argc, char **argv) {
         return 1;
 
     ROS_INFO("Bolt Detection Node Started!");
-
     boltDetector.DetectHoles();
     boltDetector.SendHoles();
 
     while (ros::ok() && boltDetector.GetStatus()) {
-//        boltDetector.DetectHoles();
+        boltDetector.DetectHoles();
 
         if ((cvWaitKey(40)&0xff) == ESC_KEY) {
             //save image
