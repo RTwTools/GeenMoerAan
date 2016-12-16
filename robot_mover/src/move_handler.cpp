@@ -2,8 +2,7 @@
 
 move_handler::move_handler(moveit::planning_interface::MoveGroup *_group) :
 group(_group) {
-    group->setGoalTolerance(0.005);
-    group->setGoalPositionTolerance(0.00000001);
+    group->setGoalTolerance(0.01);
     group->setEndEffectorLink(END_EFFECTOR);
 
 }
@@ -30,7 +29,7 @@ void move_handler::onHolesMessageReceived(const nav_msgs::Path pathMsg) {
     if (pathMsg.poses.size() != 0) {
         ROS_INFO("Received goal with [%i] location(s).", (int) pathMsg.poses.size());
         pathArray = pathMsg;
-
+        group->setGoalTolerance(0.00001);
         // Moving to each goal pose
         for (int i = 0; i < pathArray.poses.size(); i++) {
             geometry_msgs::PoseStamped p = pathArray.poses[i];
@@ -40,7 +39,8 @@ void move_handler::onHolesMessageReceived(const nav_msgs::Path pathMsg) {
                     if (MoveToPose(translatePose(p).pose))
                         ROS_INFO_STREAM("Bolt number: " << i + 1 << " inserted.");
         }
-        ROS_INFO_STREAM("All " << pathArray.poses.size() << " holes closed !");
+        ROS_INFO_STREAM("All " << pathArray.poses.size() << " holes closed !");        
+        group->setGoalTolerance(0.01);
         goHome();
     }
 }

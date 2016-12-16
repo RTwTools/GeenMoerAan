@@ -18,49 +18,53 @@
 #define IMAGE_HEIGHT_PX   1080
 #define IMAGE_HEIGHT_MM    450
 
-#define CALIBRATION_FILE_NAME	"/resources/out_camera_data.yml"
-#define TRANSFORM_FILE_NAME 	"/resources/out_transform_data.yml"
+#define CALIBRATION_FILE_NAME "/resources/out_camera_data.yml"
+#define TRANSFORM_FILE_NAME  "/resources/out_transform_data.yml"
 #define CAMERA_FRAME "camera_view_link"
 #define PACKAGE_NAME "bolt_detection"
 
-class bolt_detector
-{
+class bolt_detector {
 public:
-  // members
+    // members
 
-  // methods
-  bolt_detector();
-  bool GetStatus();
-  void DetectHoles();
-  void SendHoles();
+    // methods
+    bolt_detector();
+    bool GetStatus();
+    void DetectHoles();
+    void SendHoles();
 
 protected:
-  // members
-  ros::NodeHandle nh_, ph_;
-  ros::Publisher pubHoles_;
-  ros::Timer timer_;
-  nav_msgs::Path holes_;
+    // members
+    ros::NodeHandle nh_, ph_;
+    ros::Publisher pubHoles_;
+    ros::Timer timer_;
+    nav_msgs::Path holes_;
 
-  int publish_rate_;
-  int cameraId_;
-  bool viewCamera_;
-  bool status_;
-  bool gui_;
+    int publish_rate_;
+    int cameraId_;
+    bool viewCamera_;
+    bool status_;
+    bool gui_;
 
-  cv::VideoCapture camera_;
-  cv::Mat cameraMatrix_, distCoeffs_;
-  cv::Mat transformMatrix_;
-  cv::Mat image_, imageUndistorted_, imageCropped_, imageDetected_;
-  cv::Size usedResolution_, calibratedResolution_;
+    int iLowH = 70;
+    int iHighH = 475;
+    int iLowS = 0;
+    int iHighS = 100;
 
-  // method
-  bool OpenCamera();
-  void CreateWindows();
-  void ShowWindows();
-  bool ReadCalibrationData(std::string fileName);
-  bool ReadTransformData(std::string fileName);
-  void AddHole(int px_x, int px_y);
-  bool ProcessImage();
+    cv::VideoCapture camera_;
+    cv::Mat cameraMatrix_, distCoeffs_;
+    cv::Mat transformMatrix_;
+    cv::Mat image_, imageUndistorted_, imageCropped_, imageDetected_;
+    cv::Size usedResolution_, calibratedResolution_;
+
+    // method
+    bool OpenCamera();
+    void CreateWindows();
+    void ShowWindows();
+    bool ReadCalibrationData(std::string fileName);
+    bool ReadTransformData(std::string fileName);
+    void AddHole(int px_x, int px_y);
+    bool ProcessImage();
 };
 
 
