@@ -46,10 +46,10 @@ protected:
     bool status_;
     bool gui_;
 
-    int iLowH = 70;
-    int iHighH = 410;
-    int iLowS = 0;
-    int iHighS = 80;
+    int iLowH;
+    int iHighH;
+    int iLowS;
+    int iHighS;
 
     cv::VideoCapture camera_;
     cv::Mat cameraMatrix_, distCoeffs_;
