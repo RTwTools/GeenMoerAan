@@ -50,7 +50,7 @@ protected:
     bool status_;
     bool gui_;
 
-//    int iLowH;
+    //    int iLowH;
     //    int iHighH;
     //    int iLowS;
     //    int iHighS;

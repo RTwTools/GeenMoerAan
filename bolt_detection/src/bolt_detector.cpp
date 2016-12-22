@@ -11,10 +11,10 @@ status_(false),
 publish_rate_(5),
 gui_(false) {
 
-//    iLowH = 70;
-//    iHighH = 270;
-//    iLowS = 0;
-//    iHighS = 80;
+    //    iLowH = 70;
+    //    iHighH = 270;
+    //    iLowS = 0;
+    //    iHighS = 80;
     counter = 0;
 
     ph_.param("view_camera", viewCamera_, viewCamera_);
@@ -95,7 +95,7 @@ void bolt_detector::CreateWindows() {
 }
 
 bool bolt_detector::OpenCamera() {
-    //    camera_.open("/home/tycho/Documents/Fontys/ROB/workspace/src/geen-moer-aan/bolt_detection/src/my_video-4.avi");
+    //    camera_.open(ros::package::getPath(PACKAGE_NAME) + "/src/my_video-4.avi");
     camera_.open(cameraId_);
     if (!camera_.isOpened()) {
         ROS_INFO("Could not open camera ID [%d].", cameraId_);
