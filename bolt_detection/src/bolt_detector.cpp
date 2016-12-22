@@ -15,6 +15,7 @@ gui_(false) {
     iHighH = 270;
     iLowS = 0;
     iHighS = 80;
+    counter = 1;
 
     ph_.param("view_camera", viewCamera_, viewCamera_);
     ph_.param("camera_ID", cameraId_, cameraId_);
@@ -94,8 +95,8 @@ void bolt_detector::CreateWindows() {
 }
 
 bool bolt_detector::OpenCamera() {
-    camera_.open("/home/tycho/Documents/Fontys/ROB/workspace/src/geen-moer-aan/bolt_detection/src/my_video-4.avi");
-    //    camera_.open(cameraId_);
+    //    camera_.open("/home/tycho/Documents/Fontys/ROB/workspace/src/geen-moer-aan/bolt_detection/src/my_video-4.avi");
+    camera_.open(cameraId_);
     if (!camera_.isOpened()) {
         ROS_INFO("Could not open camera ID [%d].", cameraId_);
         return false;
@@ -166,65 +167,55 @@ bool bolt_detector::ProcessImage() {
     imageCropped_ = perspectiveImage(Rect(0, 0, IMAGE_WIDTH_PX, IMAGE_HEIGHT_PX));
     return true;
 }
+int counter = 0;
 
 void bolt_detector::DetectHoles() {
-    if (!ProcessImage()) return;
-
-    Mat cannyOutput, imageGray;
     std::vector<std::vector<Point> > contours;
     std::vector<Vec4i> hierarchy;
-
-    cvtColor(imageCropped_, imageGray, CV_BGR2GRAY);
-    GaussianBlur(imageGray, imageGray, Size(3, 3), 1);
-    Canny(imageGray, cannyOutput, iLowH, iHighH, 3);
-        int dilation_size = 9;
+    if (counter < 5) {
+        if (!ProcessImage()) return;
+        cvtColor(imageCropped_, imageGray, CV_BGR2GRAY);
+        GaussianBlur(imageGray, imageGray, Size(3, 3), 1);
+        Canny(imageGray, cannyTemp, iLowH, iHighH, 3);
+        int dilation_size = 17;
         Mat element = getStructuringElement(MORPH_ELLIPSE,
                 Size(2 * dilation_size + 1, 2 * dilation_size + 1),
                 Point(dilation_size, dilation_size));
-    
+
         for (int i = 0; i < 1; i++) {
-            dilate(cannyOutput, cannyOutput, element);
-            erode(cannyOutput, cannyOutput, element);
+            dilate(cannyTemp, cannyTemp, element);
+            erode(cannyTemp, cannyTemp, element);
         }
+        if (counter == 1)
+            cannyOutput = Mat::zeros(cannyTemp.size(), CV_8U);
+        cannyOutput += cannyTemp;
+    }
+    if (counter >= 4) {
+        counter = 0;
+        imshow("canny", cannyOutput);
+        findContours(cannyOutput, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-    imshow("canny", cannyOutput);
-    findContours(cannyOutput, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+        vector<Point2f>center(contours.size());
+        vector<float>radius(contours.size());
+//        vector<vector<Point> > contours_poly(contours.size());
+        vector<Rect> boundRect(contours.size());
 
-    vector<Point2f>center(contours.size());
-    vector<float>radius(contours.size());
-    vector<vector<Point> > contours_poly(contours.size());
-    vector<Rect> boundRect(contours.size());
-
-    for (int i = 0; i < contours.size(); i++) {
-        {
-            approxPolyDP(Mat(contours[i]), contours_poly[i], 3, true);
-            boundRect[i] = boundingRect(Mat(contours_poly[i]));
-            minEnclosingCircle((Mat) contours_poly[i], center[i], radius[i]);
+        for (int i = 0; i < contours.size(); i++) {
+            approxPolyDP(Mat(contours[i]), contours[i], 3, true);
+            boundRect[i] = boundingRect(Mat(contours[i]));
+            minEnclosingCircle((Mat) contours[i], center[i], radius[i]);
         }
         Mat drawing = Mat::zeros(cannyOutput.size(), CV_8UC3);
-        Mat drawing2 = Mat::zeros(cannyOutput.size(), CV_8UC3);
+        //            Mat drawing2 = Mat::zeros(cannyOutput.size(), CV_8UC3);
         for (int i = 0; i < contours.size(); i++) {
             Scalar color = Scalar(255, 0, 0);
-            drawContours(drawing2, contours_poly, i, color, 2, 8, hierarchy, 0, Point());
+//            drawContours(drawing, contours_poly, i, color, 2, 8, hierarchy, 0, Point());
             circle(drawing, center[i], (int) radius[i], color, 2, 8, 0);
         }
 
-            imshow("drawing", drawing2);
+        imshow("drawing", drawing);
 
         holes_.poses.clear();
-        //
-        //    // Get the moments
-        //    std::vector<Moments> mu(contours.size());
-        //    for (int i = 0; i < contours.size(); i++) {
-        //        mu[i] = moments(contours[i], false);
-        //    }
-        //
-        //    ///  Get the mass centers:
-        //    std::vector<Point2f> mc(contours.size());
-        //    for (int i = 0; i < contours.size(); i++) {
-        //        mc[i] = Point2f(mu[i].m10 / mu[i].m00, mu[i].m01 / mu[i].m00);
-        //    }
-        //
         //    /// Draw contours
         imageDetected_ = Mat::zeros(cannyOutput.size(), CV_8UC3);
 
@@ -232,13 +223,16 @@ void bolt_detector::DetectHoles() {
             if (radius[i] > 8 && radius[i] < 20) {
                 //            printf(" * Contour[%d] - Area (M_00) = %.2f - Area OpenCV: %.2f - Length: %.2f \n", i, mu[i].m00, contourArea(contours[i]), arcLength(contours[i], true));
                 Scalar color = Scalar(0, 255, 255);
-                //                drawContours(imageDetected_, contours, i, color, 2, 8, hierarchy, 0, Point());
+//                drawContours(imageDetected_, contours, i, color, 2, 8, hierarchy, 0, Point());
                 circle(imageDetected_, center[i], (int) radius[i], color, 2, 8, 0);
+                circle(imageDetected_, center[i], 1, color, 2, 8, 0);
                 AddHole(center[i].x, center[i].y);
             }
         }
+
         ShowWindows();
     }
+    counter++;
 }
 
 void bolt_detector::SendHoles() {
@@ -259,8 +253,8 @@ int main(int argc, char **argv) {
         return 1;
 
     ROS_INFO("Bolt Detection Node Started!");
-    //            boltDetector.DetectHoles();
-    //            boltDetector.SendHoles();
+    //    boltDetector.DetectHoles();
+    //    boltDetector.SendHoles();
 
     while (ros::ok() && boltDetector.GetStatus()) {
         boltDetector.DetectHoles();

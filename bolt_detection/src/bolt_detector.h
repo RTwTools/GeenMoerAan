@@ -50,12 +50,15 @@ protected:
     int iHighH;
     int iLowS;
     int iHighS;
+    int counter;
 
     cv::VideoCapture camera_;
     cv::Mat cameraMatrix_, distCoeffs_;
     cv::Mat transformMatrix_;
     cv::Mat image_, imageUndistorted_, imageCropped_, imageDetected_;
     cv::Size usedResolution_, calibratedResolution_;
+
+    cv::Mat cannyOutput, cannyTemp, imageGray;
 
     // method
     bool OpenCamera();
