@@ -207,7 +207,7 @@ void bolt_detector::DetectHoles() {
     if (counter < 5) {
         if (!ProcessImage()) return;
         FilterObject();
-        cvtColor(imageCropped_, imageGray, CV_BGR2GRAY);
+        cvtColor(imageObject_, imageGray, CV_BGR2GRAY);
         GaussianBlur(imageGray, imageGray, Size(3, 3), 1);
         Canny(imageGray, cannyTemp, 70, 270, 3);
         int dilation_size = 13;
