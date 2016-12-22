@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/scripts">
+        <file>scripts_start.sh</file>
+        <file>scripts_stop.sh</file>
+        <file>script_hole_detcection.sh</file>
+    </qresource>
+</RCC>
