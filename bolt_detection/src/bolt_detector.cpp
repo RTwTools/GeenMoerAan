@@ -18,9 +18,10 @@ gui_(false) {
     counter = 1;
 
     ph_.param("view_camera", viewCamera_, viewCamera_);
-    ph_.param("camera_ID", cameraId_, cameraId_);
+  ph_.param("camera_id", cameraId_, cameraId_);
     ph_.param("gui", gui_, gui_);
     ph_.param("publish_rate_s", publish_rate_, publish_rate_);
+
     pubHoles_ = nh_.advertise<nav_msgs::Path>("/holes", 1);
 
     //only go to the next function if the previous one returned true
@@ -162,6 +163,7 @@ bool bolt_detector::ProcessImage() {
     warpPerspective(imageUndistorted_, perspectiveImage, transformMatrix_, perspectiveImage.size());
     if (perspectiveImage.rows < IMAGE_WIDTH_PX || perspectiveImage.cols < IMAGE_HEIGHT_PX) {
         ROS_ERROR("Can't transform image, camera resolution is too small!");
+        status_ = false;
         return false;
     }
     imageCropped_ = perspectiveImage(Rect(0, 0, IMAGE_WIDTH_PX, IMAGE_HEIGHT_PX));
@@ -240,10 +242,20 @@ void bolt_detector::SendHoles() {
     holes_.header.stamp = ros::Time::now();
     pubHoles_.publish(holes_);
 
+    //save image
+    //std::string pathname = ros::package::getPath("bolt_detection") + "/resources/image.png";
+    //cv::imwrite(pathname, imageCropped_);
+
     ROS_INFO("Sent %i holes.", (int) holes_.poses.size());
 }
 
+void bolt_detector::GuiCB(const bolt_detection::Detection::ConstPtr &gui_msg) {
+    if (!gui_msg->detect) return;
+    SendHoles();
+}
+
 int main(int argc, char **argv) {
+    std::cout << "OpenCV version : " << CV_VERSION << std::endl;
     ros::init(argc, argv, "PACKAGE_NAME");
     bolt_detector boltDetector;
     ros::Rate r(5);
