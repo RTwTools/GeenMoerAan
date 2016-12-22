@@ -12,6 +12,7 @@
 #include <math.h>
 
 #define ESC_KEY             27
+#define SPACE_KEY           32
 #define CANNY_THRESH        80
 
 #define IMAGE_WIDTH_PX    1030
@@ -44,20 +45,20 @@ protected:
 
     int publish_rate_;
     int cameraId_;
+    int counter;
     bool viewCamera_;
     bool status_;
     bool gui_;
 
-    int iLowH;
-    int iHighH;
-    int iLowS;
-    int iHighS;
-    int counter;
+//    int iLowH;
+    //    int iHighH;
+    //    int iLowS;
+    //    int iHighS;
 
     cv::VideoCapture camera_;
     cv::Mat cameraMatrix_, distCoeffs_;
     cv::Mat transformMatrix_;
-    cv::Mat image_, imageUndistorted_, imageCropped_, imageDetected_;
+    cv::Mat image_, imageObject_, imageUndistorted_, imageCropped_, imageDetected_, imageDetected2_;
     cv::Size usedResolution_, calibratedResolution_;
 
     cv::Mat cannyOutput, cannyTemp, imageGray;
@@ -70,6 +71,7 @@ protected:
     bool ReadTransformData(std::string fileName);
     void AddHole(int px_x, int px_y);
     bool ProcessImage();
+    bool FilterObject();
     void GuiCB(const bolt_detection::Detection::ConstPtr &gui_msg);
 };
 

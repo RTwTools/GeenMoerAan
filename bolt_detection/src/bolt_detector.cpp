@@ -11,14 +11,14 @@ status_(false),
 publish_rate_(5),
 gui_(false) {
 
-    iLowH = 70;
-    iHighH = 270;
-    iLowS = 0;
-    iHighS = 80;
-    counter = 1;
+//    iLowH = 70;
+//    iHighH = 270;
+//    iLowS = 0;
+//    iHighS = 80;
+    counter = 0;
 
     ph_.param("view_camera", viewCamera_, viewCamera_);
-  ph_.param("camera_id", cameraId_, cameraId_);
+    ph_.param("camera_id", cameraId_, cameraId_);
     ph_.param("gui", gui_, gui_);
     ph_.param("publish_rate_s", publish_rate_, publish_rate_);
 
@@ -38,8 +38,8 @@ gui_(false) {
     //    }
 }
 
-bool bolt_detector::ReadTransformData(std::string fileName) {
-    std::string pathname = ros::package::getPath(PACKAGE_NAME) + fileName;
+bool bolt_detector::ReadTransformData(string fileName) {
+    string pathname = ros::package::getPath(PACKAGE_NAME) + fileName;
     FileStorage fs(pathname, FileStorage::READ);
     if (!fs.isOpened()) {
         ROS_ERROR("Failed to open [%s].", fileName.c_str());
@@ -54,9 +54,9 @@ bool bolt_detector::ReadTransformData(std::string fileName) {
     return true;
 }
 
-bool bolt_detector::ReadCalibrationData(std::string fileName) {
+bool bolt_detector::ReadCalibrationData(string fileName) {
     //load camera parameters from file
-    std::string pathname = ros::package::getPath(PACKAGE_NAME) + fileName;
+    string pathname = ros::package::getPath(PACKAGE_NAME) + fileName;
     //load camera parameters from file
     FileStorage fs(pathname, FileStorage::READ);
     if (!fs.isOpened()) {
@@ -86,9 +86,8 @@ void bolt_detector::CreateWindows() {
 
     }
     namedWindow("DetectedHoles", CV_WINDOW_NORMAL);
-    cvCreateTrackbar("LowH", "DetectedHoles", &iLowH, 510); //Hue (0 - 179)
-    cvCreateTrackbar("HighH", "DetectedHoles", &iHighH, 510);
-    //
+    //    cvCreateTrackbar("LowH", "DetectedHoles", &iLowH, 510); //Hue (0 - 179)
+    //    cvCreateTrackbar("HighH", "DetectedHoles", &iHighH, 510);
     //    cvCreateTrackbar("LowS", "DetectedHoles", &iLowS, 500); //Hue (0 - 179)
     //    cvCreateTrackbar("HighS", "DetectedHoles", &iHighS, 1000);
 
@@ -169,17 +168,49 @@ bool bolt_detector::ProcessImage() {
     imageCropped_ = perspectiveImage(Rect(0, 0, IMAGE_WIDTH_PX, IMAGE_HEIGHT_PX));
     return true;
 }
-int counter = 0;
+
+bool bolt_detector::FilterObject() {
+    bool filtered = false;
+    Mat cannyImage, grayImage, threshImage;
+    vector<vector<Point> > contours;
+    vector<Vec4i> hierarchy;
+
+    cvtColor(imageCropped_, grayImage, CV_BGR2GRAY);
+
+    //filter object from background
+    threshold(grayImage, threshImage, 130, 255, 0);
+
+    //find contours
+    Canny(threshImage, cannyImage, CANNY_THRESH, CANNY_THRESH * 3, 3);
+    findContours(cannyImage, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+
+    /// Draw contours
+    Mat mask = Mat::zeros(imageCropped_.size(), CV_8UC3);
+    imageDetected2_ = Mat::zeros(imageCropped_.size(), CV_8UC3);
+
+    for (int i = 0; i < contours.size(); i++) {
+        if (contourArea(contours[i]) > 50000) {
+            drawContours(mask, contours, i, Scalar(255, 255, 255), -1, 8, hierarchy, 0, Point());
+            drawContours(imageDetected2_, contours, i, Scalar(255, 255, 255), -1, 8, hierarchy, 0, Point());
+            filtered = true;
+        }
+    }
+    imageObject_ = Mat();
+    imageCropped_.copyTo(imageObject_, mask);
+    //    imshow("imageObject", imageObject_);
+    return filtered;
+}
 
 void bolt_detector::DetectHoles() {
-    std::vector<std::vector<Point> > contours;
-    std::vector<Vec4i> hierarchy;
+    vector<vector<Point> > contours;
+    vector<Vec4i> hierarchy;
     if (counter < 5) {
         if (!ProcessImage()) return;
+        FilterObject();
         cvtColor(imageCropped_, imageGray, CV_BGR2GRAY);
         GaussianBlur(imageGray, imageGray, Size(3, 3), 1);
-        Canny(imageGray, cannyTemp, iLowH, iHighH, 3);
-        int dilation_size = 17;
+        Canny(imageGray, cannyTemp, 70, 270, 3);
+        int dilation_size = 13;
         Mat element = getStructuringElement(MORPH_ELLIPSE,
                 Size(2 * dilation_size + 1, 2 * dilation_size + 1),
                 Point(dilation_size, dilation_size));
@@ -188,44 +219,42 @@ void bolt_detector::DetectHoles() {
             dilate(cannyTemp, cannyTemp, element);
             erode(cannyTemp, cannyTemp, element);
         }
-        if (counter == 1)
+        if (counter == 0)
             cannyOutput = Mat::zeros(cannyTemp.size(), CV_8U);
         cannyOutput += cannyTemp;
     }
     if (counter >= 4) {
-        counter = 0;
-        imshow("canny", cannyOutput);
+        counter = -1;
+        //        imshow("canny", cannyOutput);
         findContours(cannyOutput, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
         vector<Point2f>center(contours.size());
         vector<float>radius(contours.size());
-//        vector<vector<Point> > contours_poly(contours.size());
         vector<Rect> boundRect(contours.size());
+        //        vector<vector<Point> > contours_poly(contours.size());
 
         for (int i = 0; i < contours.size(); i++) {
             approxPolyDP(Mat(contours[i]), contours[i], 3, true);
             boundRect[i] = boundingRect(Mat(contours[i]));
             minEnclosingCircle((Mat) contours[i], center[i], radius[i]);
         }
-        Mat drawing = Mat::zeros(cannyOutput.size(), CV_8UC3);
-        //            Mat drawing2 = Mat::zeros(cannyOutput.size(), CV_8UC3);
-        for (int i = 0; i < contours.size(); i++) {
-            Scalar color = Scalar(255, 0, 0);
-//            drawContours(drawing, contours_poly, i, color, 2, 8, hierarchy, 0, Point());
-            circle(drawing, center[i], (int) radius[i], color, 2, 8, 0);
-        }
-
-        imshow("drawing", drawing);
-
+        //        Mat drawing = Mat::zeros(cannyOutput.size(), CV_8UC3);
+        //        Mat drawing2 = Mat::zeros(cannyOutput.size(), CV_8UC3);
+        //        for (int i = 0; i < contours.size(); i++) {
+        //            Scalar color = Scalar(255, 0, 0);
+        //            drawContours(drawing, contours_poly, i, color, 2, 8, hierarchy, 0, Point());
+        //            circle(drawing, center[i], (int) radius[i], color, 2, 8, 0);
+        //        }
+        //        imshow("drawing", drawing);
         holes_.poses.clear();
-        //    /// Draw contours
-        imageDetected_ = Mat::zeros(cannyOutput.size(), CV_8UC3);
 
+        /// Draw contours
+        imageDetected_ = Mat::zeros(cannyOutput.size(), CV_8UC3);
         for (int i = 0; i < contours.size(); i++) {
             if (radius[i] > 8 && radius[i] < 20) {
                 //            printf(" * Contour[%d] - Area (M_00) = %.2f - Area OpenCV: %.2f - Length: %.2f \n", i, mu[i].m00, contourArea(contours[i]), arcLength(contours[i], true));
                 Scalar color = Scalar(0, 255, 255);
-//                drawContours(imageDetected_, contours, i, color, 2, 8, hierarchy, 0, Point());
+                //                drawContours(imageDetected_, contours, i, color, 2, 8, hierarchy, 0, Point());
                 circle(imageDetected_, center[i], (int) radius[i], color, 2, 8, 0);
                 circle(imageDetected_, center[i], 1, color, 2, 8, 0);
                 AddHole(center[i].x, center[i].y);
@@ -242,9 +271,9 @@ void bolt_detector::SendHoles() {
     holes_.header.stamp = ros::Time::now();
     pubHoles_.publish(holes_);
 
-    //save image
-    //std::string pathname = ros::package::getPath("bolt_detection") + "/resources/image.png";
-    //cv::imwrite(pathname, imageCropped_);
+    //save image  
+    string pathname = ros::package::getPath("bolt_detection") + "/resources/image.png";
+    imwrite(pathname, imageCropped_);
 
     ROS_INFO("Sent %i holes.", (int) holes_.poses.size());
 }
@@ -255,7 +284,7 @@ void bolt_detector::GuiCB(const bolt_detection::Detection::ConstPtr &gui_msg) {
 }
 
 int main(int argc, char **argv) {
-    std::cout << "OpenCV version : " << CV_VERSION << std::endl;
+    cout << "OpenCV version : " << CV_VERSION << endl;
     ros::init(argc, argv, "PACKAGE_NAME");
     bolt_detector boltDetector;
     ros::Rate r(5);
@@ -270,21 +299,19 @@ int main(int argc, char **argv) {
 
     while (ros::ok() && boltDetector.GetStatus()) {
         boltDetector.DetectHoles();
+        char c = (char) cvWaitKey(1);
 
-        if ((cvWaitKey(40)&0xff) == ESC_KEY) {
-            //save image
-            //std::string pathname = ros::package::getPath("bolt_detection") + "/image.jpg";
-            //imwrite(pathname, imageCropped);
+        if (c == SPACE_KEY)
+            boltDetector.SendHoles();
 
-            std::cout << "---------------------------------------------" << std::endl;
+        if (c == ESC_KEY) {
+            cout << "---------------------------------------------" << endl;
             destroyWindow("Camera");
             destroyWindow("CameraCropped");
-
             ros::shutdown();
         }
-
         ros::spinOnce();
-        //         r.sleep();
+        r.sleep();
     }
 
     return 0;
