@@ -34,6 +34,8 @@ public:
     bool GetStatus();
     void DetectHoles();
     void SendHoles();
+    bool gui_;
+
 
 protected:
     // members
@@ -48,7 +50,6 @@ protected:
     int counter;
     bool viewCamera_;
     bool status_;
-    bool gui_;
 
     //    int iLowH;
     //    int iHighH;

@@ -31,9 +31,10 @@ gui_(false) {
     if (status_) CreateWindows();
 
 
-    //    if (gui_) {
-    //        //add subscriber to topic
-    //    } else {
+    if (gui_)
+        subGUI_ = nh_.subscribe<bolt_detection::Detection>("/detect_cmd", 1, &bolt_detector::GuiCB, this);
+
+    //    else {
     //        timer_ = nh_.createTimer(ros::Duration(publish_rate_), boost::bind(&bolt_detector::SendHoles, this));
     //    }
 }
@@ -294,14 +295,12 @@ int main(int argc, char **argv) {
         return 1;
 
     ROS_INFO("Bolt Detection Node Started!");
-    //    boltDetector.DetectHoles();
-    //    boltDetector.SendHoles();
 
     while (ros::ok() && boltDetector.GetStatus()) {
         boltDetector.DetectHoles();
         char c = (char) cvWaitKey(1);
 
-        if (c == SPACE_KEY)
+        if (c == SPACE_KEY && !boltDetector.gui_)
             boltDetector.SendHoles();
 
         if (c == ESC_KEY) {
