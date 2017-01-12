@@ -45,3 +45,19 @@ git clone https://git.fhict.nl/[repository location]/geen-moer-aan.git
 cd ..
 catkin_make
 ```
+
+### Setting up the User Interface:
+```
+cd Controller-executable
+chmod +x *
+```
+### Running the User Interface:
+```
+./Controller
+```
+Or  double click on the binary executable in "Controller-executable"
+
+Enter your workspace directory on the GUI,
+
+Notice:  this directory should be unique on the HDD !!!
+
