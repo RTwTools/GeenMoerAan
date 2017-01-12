@@ -5,6 +5,7 @@
 #include <ros/package.h>
 #include <nav_msgs/Path.h>
 #include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include <bolt_detection/Detection.h>
 
 #define ESC_KEY             27
@@ -21,13 +22,12 @@
 #define CAMERA_FRAME "camera_view_link"
 #define PACKAGE_NAME "bolt_detection"
 
-class bolt_detector {
+class bolt_detector
+{
 public:
-    // members
-
     // methods
     bolt_detector();
-    bool GetStatus();
+    bool ok();
     void DetectHoles();
     void SendHoles();
     bool gui_;
@@ -41,21 +41,15 @@ protected:
     ros::Timer timer_;
     nav_msgs::Path holes_;
 
-    int publish_rate_;
     int cameraId_;
     int frameCounter;
     bool viewCamera_;
     bool status_;
 
-    //    int iLowH;
-    //    int iHighH;
-    //    int iLowS;
-    //    int iHighS;
-
     cv::VideoCapture camera_;
     cv::Mat cameraMatrix_, distCoeffs_;
     cv::Mat transformMatrix_;
-    cv::Mat image_, imageObject_, imageUndistorted_, imageCropped_, imageDetected_, imageDetected2_;
+    cv::Mat image_, imageObject_, imageUndistorted_, imageCropped_, imageDetected_;
     cv::Size usedResolution_, calibratedResolution_;
 
     cv::Mat cannyOutput, cannyTemp, imageGray;
@@ -71,6 +65,4 @@ protected:
     bool FilterObject();
     void GuiCB(const bolt_detection::Detection::ConstPtr &gui_msg);
 };
-
-
 #endif
