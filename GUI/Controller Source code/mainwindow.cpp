@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <function.h>
-
+#include <QString>
 Function *obj;
 QString Log;
 
@@ -53,19 +53,13 @@ void MainWindow::on_startbtn_clicked()
 void MainWindow::on_detectbtn_clicked()
 {
 
-    if(ui->detectbtn->text()=="Start Detection"){
-        Log="Hole Detection Started at :";
+
+        Log="Holes sent at:";
         Log.append(obj->get_currentTime());
         ui->logmsg->append(Log);
-        ui->detectbtn->setText("Stop Detection");
-        obj->detect_holes("true");}
-    else{
-        Log="Hole Detection Stopped at :";
-        Log.append(obj->get_currentTime());
-        ui->logmsg->append(Log);
-        ui->detectbtn->setText("Start Detection");
-        obj->detect_holes("false");
-    }
+        obj->detect_holes("true");
+
+
 
 }
 
@@ -76,6 +70,8 @@ void MainWindow::on_btnLog_clicked()
     {
         ui->btnLog->setText("<<");
         size =this->width()+500;
+        QString file=":/scripts_start.sh";
+        obj->start_stop_command(file);
 
     }
     else

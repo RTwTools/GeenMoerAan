@@ -90,7 +90,7 @@ public:
         wstxt->setInputMethodHints(Qt::ImhNone);
         wstxt->setTabChangesFocus(true);
         wstxt->setLineWrapMode(QTextEdit::NoWrap);
-        wstxt->setAcceptRichText(false);
+        wstxt->setAcceptRichText(true);
         wsbtn = new QPushButton(centralWidget);
         wsbtn->setObjectName(QString::fromUtf8("wsbtn"));
         wsbtn->setGeometry(QRect(410, 140, 81, 31));
@@ -128,7 +128,7 @@ public:
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0, QApplication::UnicodeUTF8));
         startbtn->setText(QApplication::translate("MainWindow", "START SYSTEM", 0, QApplication::UnicodeUTF8));
         groupBox->setTitle(QApplication::translate("MainWindow", "Funtions", 0, QApplication::UnicodeUTF8));
-        detectbtn->setText(QApplication::translate("MainWindow", "Start Detection", 0, QApplication::UnicodeUTF8));
+        detectbtn->setText(QApplication::translate("MainWindow", "Send holes", 0, QApplication::UnicodeUTF8));
         label->setText(QString());
         label_2->setText(QApplication::translate("MainWindow", "Geenmoeraan", 0, QApplication::UnicodeUTF8));
         btnLog->setText(QApplication::translate("MainWindow", ">>", 0, QApplication::UnicodeUTF8));
