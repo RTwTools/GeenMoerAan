@@ -1,8 +1,6 @@
-
-<launch>
-  	
+<launch>  	
   <include file="$(find robot_mover)/launch/robot_mover.launch"/>
-
+        
   <include file="$(find bolt_detection)/launch/bolt_detector.launch">
 	<arg name="gui" value="true"/>
   </include>

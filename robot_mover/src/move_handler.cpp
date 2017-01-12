@@ -24,23 +24,34 @@ bool move_handler::MoveToPose(geometry_msgs::Pose pose) {
     return false;
 }
 
+//When navigation message is received
+
 void move_handler::onHolesMessageReceived(const nav_msgs::Path pathMsg) {
+    //first go home
     goHome();
+    //if there are any poses
     if (pathMsg.poses.size() != 0) {
         ROS_INFO("Received goal with [%i] location(s).", (int) pathMsg.poses.size());
         pathArray = pathMsg;
+        //set a smaller tolerance for accuracy
         group->setGoalTolerance(0.00001);
-        // Moving to each goal pose
+        // For each position received
         for (int i = 0; i < pathArray.poses.size(); i++) {
             geometry_msgs::PoseStamped p = pathArray.poses[i];
             p.pose.position.z += 0.075;
+            //move to the position above the hole
             if (MoveToPose(translatePose(p).pose))
+                //move into the hole
                 if (MoveToPose(translatePose(pathArray.poses[i]).pose))
+                    //move to the position above the hole again
                     if (MoveToPose(translatePose(p).pose))
                         ROS_INFO_STREAM("Bolt number: " << i + 1 << " inserted.");
         }
-        ROS_INFO_STREAM("All " << pathArray.poses.size() << " holes closed !");        
+        //all holes done
+        ROS_INFO_STREAM("All " << pathArray.poses.size() << " holes closed !");
+        //increase tolerance for home pose
         group->setGoalTolerance(0.01);
+        //go home again
         goHome();
     }
 }
@@ -59,17 +70,17 @@ geometry_msgs::Pose move_handler::getPose(double pX, double pY, double pZ, doubl
     return pose;
 }
 
-// Returns 0 0 0 pose
+// Returns the robot to a pose called home, above our project
 
 void move_handler::goHome() {
     MoveToPose(getPose(0.22, 0.29, 0.60, -0.1047, -0.0367, 0.4414, 0.8904));
 }
 
+// this method translates the pose to the robot's pov using tf
+
 geometry_msgs::PoseStamped move_handler::translatePose(geometry_msgs::PoseStamped poseStamped) {
     geometry_msgs::PoseStamped pout;
-
     tf::TransformListener listener;
-
     listener.waitForTransform(poseStamped.header.frame_id, ROBOT_FRAME, ros::Time(0), ros::Duration(1.0));
     listener.transformPose(ROBOT_FRAME, poseStamped, pout);
     return pout;

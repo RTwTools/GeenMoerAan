@@ -32,7 +32,6 @@ public:
     void SendHoles();
     bool gui_;
 
-
 protected:
     // members
     ros::NodeHandle nh_, ph_;
