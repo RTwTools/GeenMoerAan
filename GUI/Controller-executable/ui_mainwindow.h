@@ -83,14 +83,14 @@ public:
         btnLog->setGeometry(QRect(410, 10, 81, 27));
         wslbl = new QLabel(centralWidget);
         wslbl->setObjectName(QString::fromUtf8("wslbl"));
-        wslbl->setGeometry(QRect(20, 150, 171, 20));
+        wslbl->setGeometry(QRect(10, 120, 171, 20));
         wstxt = new QTextEdit(centralWidget);
         wstxt->setObjectName(QString::fromUtf8("wstxt"));
-        wstxt->setGeometry(QRect(200, 140, 201, 31));
+        wstxt->setGeometry(QRect(10, 140, 391, 31));
         wstxt->setInputMethodHints(Qt::ImhNone);
         wstxt->setTabChangesFocus(true);
         wstxt->setLineWrapMode(QTextEdit::NoWrap);
-        wstxt->setAcceptRichText(true);
+        wstxt->setAcceptRichText(false);
         wsbtn = new QPushButton(centralWidget);
         wsbtn->setObjectName(QString::fromUtf8("wsbtn"));
         wsbtn->setGeometry(QRect(410, 140, 81, 31));
@@ -132,7 +132,7 @@ public:
         label->setText(QString());
         label_2->setText(QApplication::translate("MainWindow", "Geenmoeraan", 0, QApplication::UnicodeUTF8));
         btnLog->setText(QApplication::translate("MainWindow", ">>", 0, QApplication::UnicodeUTF8));
-        wslbl->setText(QApplication::translate("MainWindow", "Enter Workspace Name:", 0, QApplication::UnicodeUTF8));
+        wslbl->setText(QApplication::translate("MainWindow", "Enter path to Workspace :", 0, QApplication::UnicodeUTF8));
         wsbtn->setText(QApplication::translate("MainWindow", "Enter", 0, QApplication::UnicodeUTF8));
         wslbl_2->setText(QApplication::translate("MainWindow", "Your workspace:", 0, QApplication::UnicodeUTF8));
         worksp_holder_lbl->setText(QString());
