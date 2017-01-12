@@ -5,11 +5,7 @@
 #include <ros/package.h>
 #include <nav_msgs/Path.h>
 #include <opencv2/opencv.hpp>
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "bolt_detection/Detection.h"
-#include <stdio.h>
-#include <math.h>
+#include <bolt_detection/Detection.h>
 
 #define ESC_KEY             27
 #define SPACE_KEY           32
@@ -47,7 +43,7 @@ protected:
 
     int publish_rate_;
     int cameraId_;
-    int counter;
+    int frameCounter;
     bool viewCamera_;
     bool status_;
 

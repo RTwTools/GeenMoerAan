@@ -15,7 +15,7 @@ gui_(false) {
     //    iHighH = 270;
     //    iLowS = 0;
     //    iHighS = 80;
-    counter = 0;
+    frameCounter = 0;
 
     ph_.param("view_camera", viewCamera_, viewCamera_);
     ph_.param("camera_id", cameraId_, cameraId_);
@@ -205,7 +205,7 @@ bool bolt_detector::FilterObject() {
 void bolt_detector::DetectHoles() {
     vector<vector<Point> > contours;
     vector<Vec4i> hierarchy;
-    if (counter < 5) {
+    if (frameCounter < 5) {
         if (!ProcessImage()) return;
         FilterObject();
         cvtColor(imageObject_, imageGray, CV_BGR2GRAY);
@@ -220,12 +220,12 @@ void bolt_detector::DetectHoles() {
             dilate(cannyTemp, cannyTemp, element);
             erode(cannyTemp, cannyTemp, element);
         }
-        if (counter == 0)
+        if (frameCounter == 0)
             cannyOutput = Mat::zeros(cannyTemp.size(), CV_8U);
         cannyOutput += cannyTemp;
     }
-    if (counter >= 4) {
-        counter = -1;
+    if (frameCounter >= 4) {
+        frameCounter = -1;
         //        imshow("canny", cannyOutput);
         findContours(cannyOutput, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
@@ -264,7 +264,7 @@ void bolt_detector::DetectHoles() {
 
         ShowWindows();
     }
-    counter++;
+    frameCounter++;
 }
 
 void bolt_detector::SendHoles() {

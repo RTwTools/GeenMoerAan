@@ -26,9 +26,9 @@ generate_messages(
 )
 
 catkin_package()
+find_package( OpenCV REQUIRED)
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS} )
-find_package( OpenCV REQUIRED)
 
 add_executable(boltdetector src/bolt_detector.cpp)
 target_link_libraries(boltdetector ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
