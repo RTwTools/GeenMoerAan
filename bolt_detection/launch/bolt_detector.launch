@@ -4,7 +4,11 @@
  <arg name="camera_id" default="1" />
  <arg name="gui" default="false" />
 
-  <node pkg="bolt_detection" name="bolt_detector" type="boltdetector" output="screen">
+  <node pkg="bolt_detection" 
+        name="bolt_detector" 
+        type="boltdetector" 
+        output="screen" 
+        launch-prefix="xterm -e">
     <param name="view_camera" value="$(arg view_camera)" />
     <param name="camera_id" value="$(arg camera_id)" />
     <param name="gui" value="$(arg gui)" />
