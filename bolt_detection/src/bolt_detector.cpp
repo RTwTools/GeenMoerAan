@@ -95,7 +95,7 @@ void bolt_detector::CreateWindows()
 //open camera with camera_id and return true if success
 bool bolt_detector::OpenCamera()
 {
-  //camera_.open(ros::package::getPath(PACKAGE_NAME) + "/src/my_video-4.avi");
+  //camera_.open(ros::package::getPath(PACKAGE_NAME) + "/resources/debug.mp4");
   if (!camera_.open(cameraId_))
   {
     ROS_INFO("Could not open camera ID [%d].", cameraId_);

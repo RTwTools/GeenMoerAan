@@ -9,7 +9,6 @@
      <arg name="robot_ip" value="$(arg robot_ip)" unless="$(arg sim)"/>
   </include>
   
-  <node name="robot_mover" pkg="robot_mover" type="robot_mover"	output="screen" launch-prefix="xterm -e"
-	/>
+  <node name="robot_mover" pkg="robot_mover" type="robot_mover"	output="screen" launch-prefix="xterm -e"/>
 </launch>
 
