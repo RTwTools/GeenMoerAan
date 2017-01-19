@@ -1,8 +1,16 @@
-<launch>  	
-  <include file="$(find robot_mover)/launch/robot_mover.launch"/>
+<launch>
+  <arg name="sim" default="false" />
+  <arg name="gui" default="true" />
+
+  <include file="$(find robot_mover)/launch/robot_mover.launch">
+    <arg name="sim" value="$(arg sim)" />
+  </include>
         
   <include file="$(find bolt_detection)/launch/bolt_detector.launch">
-	<arg name="gui" value="true"/>
+    <arg name="gui" value="$(arg gui)"/>
   </include>
+
+  <include file="$(find machine_learning)/launch/machine_learning.launch"/>
+
 </launch>
 
