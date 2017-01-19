@@ -30,7 +30,7 @@ public:
     bool ok();
     void DetectHoles();
     void SendHoles();
-    bool gui_;
+    bool gui_, viewSize_;
 
 protected:
     // members
@@ -42,8 +42,7 @@ protected:
 
     int cameraId_;
     int frameCounter;
-    bool viewCamera_;
-    bool status_;
+    bool viewCamera_, status_;
 
     cv::VideoCapture camera_;
     cv::Mat cameraMatrix_, distCoeffs_;

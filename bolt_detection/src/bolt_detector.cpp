@@ -8,7 +8,8 @@ bolt_detector::bolt_detector() :
   viewCamera_(false),
   cameraId_(1),
   status_(false),
-  gui_(false)
+  gui_(false),
+  viewSize_(false)
 {
   frameCounter = 0;
 
@@ -231,7 +232,7 @@ void bolt_detector::DetectHoles()
   {
     //if process and filter is a success, continue
     if (!ProcessImage()) return;
-      FilterObject();
+    FilterObject();
     //Actual filtering of images
     //cvt to gray
     cvtColor(imageObject_, imageGray, CV_BGR2GRAY);
@@ -290,8 +291,18 @@ void bolt_detector::DetectHoles()
         circle(imageDetected_, center[i], (int) radius[i], color, 2, 8, 0);
         circle(imageDetected_, center[i], 1, color, 2, 8, 0);
         AddHole(center[i].x, center[i].y);
+        if (viewSize_)
+        {
+          stringstream ss;
+          ss << setprecision(4) << (radius[i]*2);
+          Point2f p = center[i];
+          p.x += radius[i];
+          putText(imageDetected_, ss.str(), p,
+            FONT_HERSHEY_PLAIN, 2, Scalar(0, 255, 0), 2);
+        }
       }
     }
+
     //display holes
     ShowWindows();
   }
@@ -343,9 +354,12 @@ int main(int argc, char **argv)
     boltDetector.DetectHoles();
     char c = (char) cvWaitKey(1);
 
-    //if space is pressed send holes
+    //if space is pressed send holes & gui isn't set
     if (c == SPACE_KEY && !boltDetector.gui_)
-      boltDetector.SendHoles();
+      boltDetector.SendHoles();    
+    //if space is pressed send holes & gui is set
+    if (c == SPACE_KEY && boltDetector.gui_)
+      boltDetector.viewSize_= !boltDetector.viewSize_;
 
     //close program if escape is pressed
     if (c == ESC_KEY)
