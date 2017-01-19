@@ -30,7 +30,7 @@ public:
     bool ok();
     void DetectHoles();
     void SendHoles();
-    bool gui_, viewSize_;
+    bool gui_, viewSize_, setSize_;
 
 protected:
     // members
@@ -49,9 +49,9 @@ protected:
     cv::Mat transformMatrix_;
     cv::Mat image_, imageObject_, imageUndistorted_, imageCropped_, imageDetected_;
     cv::Size usedResolution_, calibratedResolution_;
-
     cv::Mat cannyOutput, cannyTemp, imageGray;
-
+    std::vector<float> sizes;
+    
     // method
     bool OpenCamera();
     void CreateWindows();

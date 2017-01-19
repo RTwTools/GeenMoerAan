@@ -9,7 +9,8 @@ bolt_detector::bolt_detector() :
   cameraId_(1),
   status_(false),
   gui_(false),
-  viewSize_(false)
+  viewSize_(false),
+  setSize_(false)
 {
   frameCounter = 0;
 
@@ -291,12 +292,18 @@ void bolt_detector::DetectHoles()
         circle(imageDetected_, center[i], (int) radius[i], color, 2, 8, 0);
         circle(imageDetected_, center[i], 1, color, 2, 8, 0);
         AddHole(center[i].x, center[i].y);
+        if (setSize_)
+        {
+          sizes = radius;
+          this->setSize_ = false;
+          viewSize_ = true;
+        }
         if (viewSize_)
         {
           stringstream ss;
-          ss << setprecision(4) << (radius[i]*2);
+          ss << setprecision(4) << (sizes[i]*2);
           Point2f p = center[i];
-          p.x += radius[i];
+          p.x += sizes[i];
           putText(imageDetected_, ss.str(), p,
             FONT_HERSHEY_PLAIN, 2, Scalar(0, 255, 0), 2);
         }
@@ -356,11 +363,16 @@ int main(int argc, char **argv)
 
     //if space is pressed send holes & gui isn't set
     if (c == SPACE_KEY && !boltDetector.gui_)
-      boltDetector.SendHoles();    
+      boltDetector.SendHoles();
     //if space is pressed send holes & gui is set
     if (c == SPACE_KEY && boltDetector.gui_)
-      boltDetector.viewSize_= !boltDetector.viewSize_;
+    {
+      if (boltDetector.viewSize_)
+        boltDetector.viewSize_ = !boltDetector.viewSize_;
+      else
+        boltDetector.setSize_ = !boltDetector.setSize_;
 
+    }
     //close program if escape is pressed
     if (c == ESC_KEY)
     {
