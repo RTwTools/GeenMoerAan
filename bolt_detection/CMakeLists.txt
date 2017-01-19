@@ -8,6 +8,9 @@ find_package(catkin REQUIRED COMPONENTS
   roslib
   roscpp
   std_msgs
+  sensor_msgs
+  nav_msgs
+  cv_bridge
   message_generation
 )
 
@@ -17,12 +20,15 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
    FILES
    Detection.msg
+   BoltHoleInfo.msg
  )
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
    DEPENDENCIES
-   std_msgs  # Or other packages containing msgs
+   std_msgs
+   nav_msgs
+   sensor_msgs
 )
 
 catkin_package()

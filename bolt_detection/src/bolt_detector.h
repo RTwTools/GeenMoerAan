@@ -7,6 +7,8 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <bolt_detection/Detection.h>
+#include <bolt_detection/BoltHoleInfo.h>
+#include <cv_bridge/cv_bridge.h>
 
 #define ESC_KEY             27
 #define SPACE_KEY           32
@@ -35,7 +37,7 @@ public:
 protected:
     // members
     ros::NodeHandle nh_, ph_;
-    ros::Publisher pubHoles_;
+    ros::Publisher pubHolesInfo_;
     ros::Subscriber subGUI_;
     ros::Timer timer_;
     nav_msgs::Path holes_;
