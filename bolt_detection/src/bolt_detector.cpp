@@ -301,7 +301,12 @@ void bolt_detector::DetectHoles()
         if (viewSize_)
         {
           stringstream ss;
-          ss << setprecision(4) << (sizes[i]*2);
+          if(sizes[i] < 11)
+          ss << "M8";
+          if(sizes[i] > 11 && sizes[i] < 14)
+          ss << "M10";
+          if(sizes[i] > 14)
+          ss << "M12";
           Point2f p = center[i];
           p.x += sizes[i];
           putText(imageDetected_, ss.str(), p,
