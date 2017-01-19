@@ -21,7 +21,7 @@ bolt_detector::bolt_detector() :
   //gui support boolean
   ph_.param("gui", gui_, gui_);
   //init publisher topic for Path msg
-  pubHoles_ = nh_.advertise<nav_msgs::Path>("/holes", 1);
+  pubHolesInfo_ = nh_.advertise<bolt_detection::BoltHoleInfo>("/holeData", 1);
 
   //only go to the next function if the previous one returned true
   if (OpenCamera() && ReadCalibrationData(CALIBRATION_FILE_NAME) && ReadTransformData(TRANSFORM_FILE_NAME))
@@ -30,13 +30,12 @@ bolt_detector::bolt_detector() :
     status_ = true;
   }
 
-  //if gui is set, subscribe GuiCB
+  //if gui is set, subscribe to GuiCallBack
   if (gui_)
     subGUI_ = nh_.subscribe<bolt_detection::Detection>("/detect_cmd", 1, &bolt_detector::GuiCB, this);
 }
 
 //Read transform data of Logitech C920 camera and return if success
-
 bool bolt_detector::ReadTransformData(string fileName)
 {
   string pathname = ros::package::getPath(PACKAGE_NAME) + fileName;
@@ -52,7 +51,6 @@ bool bolt_detector::ReadTransformData(string fileName)
 }
 
 //Read calibration data of Logitech C920 camera and return if success
-
 bool bolt_detector::ReadCalibrationData(string fileName)
 {
   //load camera parameters from file
@@ -80,7 +78,6 @@ bool bolt_detector::ok()
 }
 
 //Create the windows and resize them
-
 void bolt_detector::CreateWindows()
 {
   if (viewCamera_)
@@ -96,11 +93,9 @@ void bolt_detector::CreateWindows()
 }
 
 //open camera with camera_id and return true if success
-
 bool bolt_detector::OpenCamera()
 {
-  //    camera_.open(ros::package::getPath(PACKAGE_NAME) + "/src/my_video-4.avi");
-
+  //camera_.open(ros::package::getPath(PACKAGE_NAME) + "/src/my_video-4.avi");
   if (!camera_.open(cameraId_))
   {
     ROS_INFO("Could not open camera ID [%d].", cameraId_);
@@ -111,7 +106,7 @@ bool bolt_detector::OpenCamera()
   camera_.set(CV_CAP_PROP_FRAME_WIDTH, 1920);
   camera_.set(CV_CAP_PROP_FRAME_HEIGHT, 1080);
 
-  //set the used resolution size
+  //read resolution
   usedResolution_ = Size((int) camera_.get(CV_CAP_PROP_FRAME_WIDTH),
     (int) camera_.get(CV_CAP_PROP_FRAME_HEIGHT));
 
@@ -120,7 +115,6 @@ bool bolt_detector::OpenCamera()
 }
 
 //Show images on created windows
-
 void bolt_detector::ShowWindows()
 {
   if (viewCamera_)
@@ -132,33 +126,28 @@ void bolt_detector::ShowWindows()
 }
 
 // Add position of holes from image to nav_msg path
-
 void bolt_detector::AddHole(int px_x, int px_y)
 {
-  float mm_x = (float) px_x * ((float) IMAGE_WIDTH_MM / IMAGE_WIDTH_PX);
-  float mm_y = (float) px_y * ((float) IMAGE_HEIGHT_MM / IMAGE_HEIGHT_PX);
+  geometry_msgs::PoseStamped hole;
 
-  geometry_msgs::PoseStamped point;
+  //orientation: downwards
+  hole.pose.orientation.x = 0.7071;
+  hole.pose.orientation.y = 0.0;
+  hole.pose.orientation.z = -0.7071;
+  hole.pose.orientation.w = 0.0;
+  //position in pixels
+  hole.pose.position.x = px_x;
+  hole.pose.position.y = px_y;
+  hole.pose.position.z = 0;
 
-  //orientation downwards
-  point.pose.orientation.x = 0.7071;
-  point.pose.orientation.y = 0.0;
-  point.pose.orientation.z = -0.7071;
-  point.pose.orientation.w = 0.0;
-  //position
-  point.pose.position.x = (mm_y / 1000);
-  point.pose.position.y = (mm_x / 1000);
-  point.pose.position.z = 0;
+  hole.header.frame_id = CAMERA_FRAME;
 
-  point.header.frame_id = CAMERA_FRAME;
+  ROS_DEBUG("Added hole: x[%f], y[%f].", hole.pose.position.x, hole.pose.position.y);
 
-  ROS_DEBUG("Added hole: x[%f], y[%f].", point.pose.position.x, point.pose.position.y);
-
-  holes_.poses.push_back(point);
+  holes_.poses.push_back(hole);
 }
 
 //get new image then undistort and warp for detection use.
-
 bool bolt_detector::ProcessImage()
 {
   //get new image
@@ -187,7 +176,6 @@ bool bolt_detector::ProcessImage()
 }
 
 //filter the most significant object to reduce noise checks
-
 bool bolt_detector::FilterObject()
 {
   bool filtered = false;
@@ -222,8 +210,6 @@ bool bolt_detector::FilterObject()
   imageCropped_.copyTo(imageObject_, mask);
   return filtered;
 }
-
-//
 
 void bolt_detector::DetectHoles()
 {
@@ -326,15 +312,31 @@ void bolt_detector::DetectHoles()
 
 void bolt_detector::SendHoles()
 {
+  bolt_detection::BoltHoleInfo hole_data;
+
+  //Path
   holes_.header.frame_id = CAMERA_FRAME;
   holes_.header.stamp = ros::Time::now();
-  pubHoles_.publish(holes_);
 
-  //save image  
-  string pathname = ros::package::getPath("bolt_detection") + "/resources/image.png";
-  imwrite(pathname, imageCropped_);
+  //Image
+  std_msgs::Header h;
+  h.stamp = ros::Time::now();
+  cv_bridge::CvImage cv_img(h, sensor_msgs::image_encodings::BGR8, imageCropped_);
 
-  ROS_INFO("Sent %i holes.", (int) holes_.poses.size());
+  //fill msg
+  sensor_msgs::Image img_msg;
+  cv_img.toImageMsg(img_msg);
+  hole_data.image = img_msg;
+  hole_data.path = holes_;
+  pubHolesInfo_.publish(hole_data);
+
+  /*//save image
+  string pathname = ros::package::getPath("bolt_detection") + "/resources/";
+  imwrite(pathname + "imageCropped.png", imageCropped_);
+  imwrite(pathname + "imageCamera.png", image_);
+  imwrite(pathname + "imageDetected.png", imageDetected_);*/
+
+  ROS_INFO("BD: Sent %i holes.", (int) holes_.poses.size());
 }
 
 //callback for GUI support
@@ -357,7 +359,7 @@ int main(int argc, char **argv)
   if (!boltDetector.ok())
     return -1;
 
-  ROS_INFO("Bolt Detection Node Started!");
+  ROS_INFO("BD: Node Started!");
 
   //while ros and boltdetection are ok
   while (ros::ok() && boltDetector.ok())
@@ -381,9 +383,8 @@ int main(int argc, char **argv)
     //close program if escape is pressed
     if (c == ESC_KEY)
     {
-      cout << "---------------------------------------------" << endl;
-      destroyWindow("Camera");
-      destroyWindow("CameraCropped");
+      ROS_INFO("---------------------------------------------");
+      destroyAllWindows();
       ros::shutdown();
       break;
     }
