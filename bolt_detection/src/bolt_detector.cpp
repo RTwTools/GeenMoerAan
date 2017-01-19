@@ -230,8 +230,8 @@ void bolt_detector::DetectHoles()
   if (frameCounter < 5)
   {
     //if process and filter is a success, continue
-    if (!ProcessImage() || !FilterObject()) return;
-
+    if (!ProcessImage()) return;
+      FilterObject();
     //Actual filtering of images
     //cvt to gray
     cvtColor(imageObject_, imageGray, CV_BGR2GRAY);
@@ -328,7 +328,7 @@ int main(int argc, char **argv)
   cout << "OpenCV version : " << CV_VERSION << endl;
   ros::init(argc, argv, PACKAGE_NAME);
   bolt_detector boltDetector;
-  ros::Rate r(5);
+  ros::Rate r(50);
 
   //check if boltDetector loaded correctly
   if (!boltDetector.ok())
