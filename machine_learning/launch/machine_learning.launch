@@ -1,0 +1,3 @@
+<launch>
+	<node pkg="machine_learning" name="machine_learning" type="machine_learning_node" output="screen"/>
+</launch>
