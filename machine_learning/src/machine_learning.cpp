@@ -26,10 +26,6 @@ using namespace std;
 #define SAVE_OBJECT_FILE_NAME "/resources/out_save_object_data.yml"
 
 Scalar COLOR_GREEN = Scalar(0, 255, 0);
-Scalar COLOR_RED =   Scalar(0, 0, 255);
-
-Mat imageFromCamera;
-Point MousePos;
 
 struct Object_Data {
     vector<Point> contour;
@@ -68,19 +64,21 @@ vector<Point2f> receivedHoles;
 bool gotHoles = false;
 vector<Point2f> holesToSend;
 bool reorderFinished;
+Mat imageFromCamera;
+Point MousePos;
 
 vector<bool> selected;
 vector<Point2f> holesOrdered;
 
-int findSameShape(vector<Point> imageContour, ShapeStatus * status)
+int findSameShape(vector<Point> imageContour)
 {
   for (int i=0;i<AllFoundObjectInFile.size(); i++)
   {
     double difference = matchShapes(imageContour, AllFoundObjectInFile[i].contour,1,0.0);
-    ROS_INFO("Difference = [%f]", difference);
-    *status = IsSameShape(difference);
-    if (*status != Different)
-      return i;
+    ROS_INFO("ML: Shape difference = [%f]", difference);
+
+    if (IsSameShape(difference) != Different)
+      return i; //shape is known
   }
   return NOT_FOUND;
 }
@@ -106,24 +104,28 @@ int main(int argc, char *argv[])
   ros::Subscriber subHoles_ = nh_.subscribe("/holeData",1,&rosCallbackHoles);
   pubHoles_ = nh_.advertise<nav_msgs::Path>("/holes", 1);
 
-  string pathname_savedata = ros::package::getPath(PACKAGE_NAME) + SAVE_OBJECT_FILE_NAME;
 
+
+  //create window to show image
   namedWindow("Camera_Image", CV_WINDOW_NORMAL);
   resizeWindow("Camera_Image", 515, 540);
 
+  //read known shape data from file
+  string pathname_savedata = ros::package::getPath(PACKAGE_NAME) + SAVE_OBJECT_FILE_NAME;
   FileStorage fs(pathname_savedata, FileStorage::READ);
   if (fs.isOpened())
     GetAllDataOutFile(pathname_savedata, AllFoundObjectInFile);
 
   while (ros::ok())
   {
+    //wait for a message with holesInfo
     while(!gotHoles && ros::ok())
     {
+      //exit program when user pressed ESC-key
       if((cvWaitKey(40)&0xff)==ESC_KEY)
       {
-        SaveObjectsInFile(pathname_savedata, AllFoundObjectInFile);
-        cout << "---------------------------------------------" << endl;
-        destroyWindow("Camera_Image");
+        ROS_INFO("---------------------------------------------");
+        destroyAllWindows();
         return 0;
       }
 
@@ -135,8 +137,7 @@ int main(int argc, char *argv[])
     vector<Point> cameraContour = GetContourOfObject(imageFromCamera);
 
     //check if shape is already known
-    ShapeStatus status;
-    int index = findSameShape(cameraContour, &status);
+    int index = findSameShape(cameraContour);
     if (index != NOT_FOUND)
     {
       ROS_INFO("ML: Found same shape at index [%i].", index);
@@ -155,12 +156,7 @@ int main(int argc, char *argv[])
       vector<Point2f> transformedFileHoles;
       perspectiveTransform(AllFoundObjectInFile[index].holes, transformedFileHoles, warp_mat_inverse);
 
-      /*ROS_INFO("Transform Holes");
-      for (int nr = 0; nr < transformedFileHoles.size(); ++nr)
-      {
-        ROS_INFO("trans [%f,%f] received [%f,%f]", transformedFileHoles[nr].x, transformedFileHoles[nr].y, receivedHoles[nr].x,  receivedHoles[nr].y);
-      }*/
-      //get holes order
+      //reorder holes
       holesToSend.clear();
       for (int i = 0; i < transformedFileHoles.size(); ++i)
       {
@@ -172,7 +168,7 @@ int main(int argc, char *argv[])
     {
       ROS_INFO("ML: Received new shape!");
 
-      //reorder holes
+      // get holes order from user
       reorderFinished = false;
       selected = vector<bool>(receivedHoles.size(), false);
       setMouseCallback("Camera_Image", MouseCB, NULL);
@@ -194,17 +190,22 @@ int main(int argc, char *argv[])
     //show received image
     imshow("Camera_Image", imageFromCamera);
 
+    //save known shapes in file
+    SaveObjectsInFile(pathname_savedata, AllFoundObjectInFile);
+
     SendHoles();
     gotHoles = false;
   }
 }
 
+//send holes to the robot_mover
 void SendHoles()
 {
   holes_.header.frame_id = CAMERA_FRAME;
   holes_.header.stamp = ros::Time::now();
   holes_.poses.clear();
 
+  //add each hole to a msg
   for (int i = 0; i < (int)holesToSend.size(); i++)
     AddHole(holesToSend[i].x, holesToSend[i].y);
 
@@ -212,6 +213,7 @@ void SendHoles()
   pubHoles_.publish(holes_);
 }
 
+//add hole to the list of holes to send to the robot_mover
 void AddHole(int px_x, int px_y)
 {
     float mm_x = (float) px_x * ((float) IMAGE_WIDTH_MM / IMAGE_WIDTH_PX);
@@ -231,11 +233,12 @@ void AddHole(int px_x, int px_y)
 
     point.header.frame_id = CAMERA_FRAME;
 
-    ROS_DEBUG("Added hole: x[%f], y[%f].", point.pose.position.x, point.pose.position.y);
+    ROS_DEBUG("ML: Added hole: x[%f], y[%f].", point.pose.position.x, point.pose.position.y);
 
     holes_.poses.push_back(point);
 }
 
+//Callback to receive holes from the bolt_detector
 void rosCallbackHoles(const bolt_detection::BoltHoleInfo boltdetectmsg)
 {
   if (!boltdetectmsg.path.poses.empty())
@@ -250,6 +253,7 @@ void rosCallbackHoles(const bolt_detection::BoltHoleInfo boltdetectmsg)
   imageFromCamera = cv_ptr->image;
 }
 
+//calculate the distance between two points
 float DistanceBetweenPoints(Point2f p1, Point2f p2)
 {
   float x = p1.x - p2.x;
@@ -258,6 +262,7 @@ float DistanceBetweenPoints(Point2f p1, Point2f p2)
   return distance;
 }
 
+//Handle user input to get an order for the holes
 void MouseCB(int event, int x, int y, int flags, void* userdata)
 {
   if ( event == EVENT_LBUTTONDOWN )
@@ -337,6 +342,7 @@ vector<Point> GetContourOfObject(Mat& object)
   }
 }
 
+//Save all the known shapes in a file
 void SaveObjectsInFile(const string& filename , vector<Object_Data>& allobjects)
 {
   FileStorage fs(filename, FileStorage::READ);
@@ -351,6 +357,7 @@ void SaveObjectsInFile(const string& filename , vector<Object_Data>& allobjects)
   fs.release();
 }
 
+//Read all the known shapes from a file
 void GetAllDataOutFile(const string& filename , vector<Object_Data>& allobjects)
 {
     FileStorage fs(filename, FileStorage::READ);
@@ -372,6 +379,7 @@ void GetAllDataOutFile(const string& filename , vector<Object_Data>& allobjects)
     fs.release();
 }
 
+//check the value of the difference
 ShapeStatus IsSameShape(double difference)
 {
   if (difference == 0) //Same Shape, Same rotation
