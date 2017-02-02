@@ -41,7 +41,7 @@ sudo apt-get install ros-indigo-moveit-full ros-indigo-abb-driver ros-indigo-con
 
 ```
 cd src
-git clone https://git.fhict.nl/[repository location]/geen-moer-aan.git
+git clone https://github.com/RTwTools/GeenMoerAan.git
 cd ..
 catkin_make
 ```
